@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Depo Tarama</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+<style>
+  :root{
+    --bg: #14161A; --panel: #1D2026; --panel-raised: #24272F; --line: #33373F;
+    --ink: #EDEFF2; --ink-dim: #9AA0AC; --ink-faint: #5C616C;
+    --amber: #F0A93B; --amber-dim: #6B531E;
+    --green: #3FCE8E; --green-dim: #1A4A38;
+    --red: #FF6B6B; --red-dim: #4D2226;
+    --mono: 'JetBrains Mono', monospace; --sans: 'Space Grotesk', sans-serif;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
+  html,body{margin:0; padding:0; background:var(--bg); color:var(--ink); font-family:var(--sans); overscroll-behavior:none;}
+  body{min-height:100vh; padding-bottom:40px;}
+  .wrap{max-width:520px; margin:0 auto; padding:0 16px;}
+
+  header{padding:18px 16px 14px; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:50; background:var(--bg);}
+  .header-row{max-width:520px; margin:0 auto; display:flex; align-items:center; justify-content:space-between;}
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand-mark{width:30px; height:30px; border-radius:6px;
+    background: repeating-linear-gradient(90deg, var(--amber) 0px, var(--amber) 2px, transparent 2px, transparent 4px, var(--ink) 4px, var(--ink) 5px, transparent 5px, transparent 8px);
+    flex-shrink:0;}
+  .brand h1{font-size:16px; margin:0; font-weight:600;}
+  .brand .sub{font-size:11px; color:var(--ink-faint); font-family:var(--mono); margin-top:1px;}
+  .stat-pill{font-family:var(--mono); font-size:11px; color:var(--ink-dim); background:var(--panel); border:1px solid var(--line); padding:5px 10px; border-radius:20px;}
+
+  .mode-switch{display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:14px 16px 0;}
+  .mode-btn{padding:16px 8px; border-radius:12px; border:1.5px solid var(--line); background:var(--panel); color:var(--ink-dim);
+    font-family:var(--sans); font-weight:600; font-size:14px; display:flex; flex-direction:column; align-items:center; gap:4px;
+    cursor:pointer; transition:all .15s ease; user-select:none;}
+  .mode-btn .icon{font-size:20px; line-height:1;}
+  .mode-btn.active-add{background:var(--green-dim); border-color:var(--green); color:var(--green);}
+  .mode-btn.active-remove{background:var(--red-dim); border-color:var(--red); color:var(--red);}
+
+  .scan-zone{padding:14px 16px 0;}
+  .scan-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px; position:relative; overflow:hidden;}
+  .scan-input-row{display:flex; gap:8px;}
+  #barcodeInput{flex:1; background:var(--panel-raised); border:1.5px solid var(--line); border-radius:10px; color:var(--ink);
+    font-family:var(--mono); font-size:15px; padding:13px 12px; outline:none;}
+  #barcodeInput:focus{border-color:var(--amber);}
+  .cam-toggle{width:48px; flex-shrink:0; border-radius:10px; border:1.5px solid var(--line); background:var(--panel-raised);
+    color:var(--ink-dim); font-size:19px; cursor:pointer; display:flex; align-items:center; justify-content:center;}
+  .cam-toggle.on{border-color:var(--amber); color:var(--amber); background:var(--amber-dim);}
+  .scan-hint{font-size:11px; color:var(--ink-faint); margin-top:8px; font-family:var(--mono);}
+  #readerWrap{margin-top:12px; border-radius:10px; overflow:hidden; display:none; position:relative;}
+  #readerWrap.show{display:block;}
+  #reader{width:100%;}
+  .scanline{position:absolute; left:6%; right:6%; height:2px; top:50%; background:var(--amber); box-shadow:0 0 8px var(--amber);
+    animation:scan 1.6s ease-in-out infinite; pointer-events:none; z-index:5;}
+  @keyframes scan{0%,100%{top:20%;} 50%{top:80%;}}
+
+  .result-zone{padding:14px 16px 0;}
+  .result-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; display:none;}
+  .result-card.show{display:block; animation:pop .2s ease;}
+  @keyframes pop{from{transform:scale(.97); opacity:0;} to{transform:scale(1); opacity:1;}}
+  .result-card.ok{border-color:var(--green);}
+  .result-card.err{border-color:var(--red);}
+  .result-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+  .result-name{font-size:15px; font-weight:600; line-height:1.35;}
+  .result-meta{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:6px; display:flex; gap:12px; flex-wrap:wrap;}
+  .result-delta{font-family:var(--mono); font-weight:700; font-size:22px; flex-shrink:0; padding:4px 10px; border-radius:8px;}
+  .result-delta.add{color:var(--green); background:var(--green-dim);}
+  .result-delta.remove{color:var(--red); background:var(--red-dim);}
+  .result-stockline{margin-top:12px; display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:13px; color:var(--ink-dim);}
+  .result-stockline b{color:var(--ink); font-size:16px;}
+  .undo-btn{margin-top:12px; width:100%; padding:11px; border-radius:9px; border:1px solid var(--line); background:var(--panel-raised);
+    color:var(--ink-dim); font-family:var(--sans); font-weight:600; font-size:13px; cursor:pointer;}
+  .err-text{color:var(--red); font-size:13px; font-family:var(--mono); margin-top:4px;}
+
+  .history-zone{padding:20px 16px 0;}
+  .history-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
+  .history-head h2{font-size:12px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-faint); margin:0; font-weight:600;}
+  .tape{background:var(--panel); border:1px solid var(--line); border-radius:12px; max-height:340px; overflow-y:auto;}
+  .tape-row{display:flex; align-items:center; gap:10px; padding:11px 14px; border-bottom:1px dashed var(--line); font-size:13px;}
+  .tape-row:last-child{border-bottom:none;}
+  .tape-icon{width:26px; height:26px; border-radius:7px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700;}
+  .tape-icon.add{background:var(--green-dim); color:var(--green);}
+  .tape-icon.remove{background:var(--red-dim); color:var(--red);}
+  .tape-info{flex:1; min-width:0;}
+  .tape-name{font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--ink);}
+  .tape-sub{font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); margin-top:2px;}
+  .tape-empty{padding:24px 14px; text-align:center; color:var(--ink-faint); font-size:12.5px;}
+
+  .search-zone{padding:20px 16px 0;}
+  #searchInput{width:100%; background:var(--panel); border:1px solid var(--line); border-radius:10px; color:var(--ink);
+    font-family:var(--sans); font-size:13px; padding:10px 12px; outline:none;}
+  #searchInput:focus{border-color:var(--amber);}
+  .search-results{margin-top:8px; max-height:220px; overflow-y:auto; display:none;}
+  .search-results.show{display:block;}
+  .search-row{display:flex; justify-content:space-between; align-items:center; gap:8px; padding:9px 12px; background:var(--panel);
+    border:1px solid var(--line); border-radius:9px; margin-bottom:6px; font-size:12.5px;}
+  .search-row .n{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;}
+  .search-row .s{font-family:var(--mono); color:var(--amber); font-weight:600; flex-shrink:0;}
+
+  footer{text-align:center; padding:26px 16px 10px; color:var(--ink-faint); font-size:10.5px; font-family:var(--mono);}
+
+  /* Login overlay */
+  #loginOverlay{position:fixed; inset:0; background:var(--bg); z-index:200; display:flex; align-items:center; justify-content:center; padding:20px;}
+  .login-box{width:100%; max-width:340px; text-align:center;}
+  .login-box .brand-mark{width:44px; height:44px; margin:0 auto 16px; border-radius:9px;}
+  .login-box h2{font-size:17px; margin:0 0 6px;}
+  .login-box p{font-size:12.5px; color:var(--ink-faint); margin:0 0 20px;}
+  #pwInput{width:100%; background:var(--panel); border:1.5px solid var(--line); border-radius:10px; color:var(--ink);
+    font-family:var(--mono); font-size:15px; padding:13px 14px; outline:none; text-align:center;}
+  #pwInput:focus{border-color:var(--amber);}
+  #loginBtn{width:100%; margin-top:10px; padding:13px; border-radius:10px; border:none; background:var(--amber); color:#1A1500;
+    font-family:var(--sans); font-weight:700; font-size:14px; cursor:pointer;}
+  #loginErr{color:var(--red); font-size:12px; margin-top:10px; font-family:var(--mono); min-height:16px;}
+
+  /* Loading overlay */
+  #loadingOverlay{position:fixed; inset:0; background:var(--bg); z-index:150; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px;}
+  .spinner{width:34px; height:34px; border-radius:50%; border:3px solid var(--line); border-top-color:var(--amber); animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  #loadingOverlay p{color:var(--ink-faint); font-size:12.5px; font-family:var(--mono);}
+  #loadingOverlay.hide, #loginOverlay.hide{display:none;}
+</style>
+</head>
+<body>
+
+<div id="loginOverlay">
+  <div class="login-box">
+    <div class="brand-mark"></div>
+    <h2>Depo Tarama</h2>
+    <p>Erişmek için şifreyi girin</p>
+    <input id="pwInput" type="password" placeholder="Şifre" autocomplete="off">
+    <button id="loginBtn" onclick="tryLogin()">Giriş Yap</button>
+    <div id="loginErr"></div>
+  </div>
+</div>
+
+<div id="loadingOverlay" class="hide">
+  <div class="spinner"></div>
+  <p>Ürün listesi yükleniyor…</p>
+</div>
+
+<header>
+  <div class="header-row">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div>
+        <h1>Depo Tarama</h1>
+        <div class="sub" id="catalogCount">— ürün</div>
+      </div>
+    </div>
+    <div class="stat-pill" id="totalStock">toplam: —</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="mode-switch">
+    <div class="mode-btn active-add" id="modeAddBtn" onclick="setMode('add')">
+      <div class="icon">＋</div><div>DEPOYA EKLE</div>
+    </div>
+    <div class="mode-btn" id="modeRemoveBtn" onclick="setMode('remove')">
+      <div class="icon">－</div><div>DEPODAN ÇIKAR</div>
+    </div>
+  </div>
+
+  <div class="scan-zone">
+    <div class="scan-card">
+      <div class="scan-input-row">
+        <input id="barcodeInput" type="text" placeholder="Barkod okutun veya elle yazın" autocomplete="off" autocorrect="off" spellcheck="false">
+        <button class="cam-toggle" id="camToggle" onclick="toggleCamera()">▢</button>
+      </div>
+      <div class="scan-hint" id="scanHint">Kablosuz/kablolu okuyucu bu kutuya otomatik yazar · Enter ile onaylanır</div>
+      <div id="readerWrap"><div id="reader"></div><div class="scanline"></div></div>
+    </div>
+  </div>
+
+  <div class="result-zone"><div class="result-card" id="resultCard"></div></div>
+
+  <div class="history-zone">
+    <div class="history-head">
+      <h2>Son İşlemler</h2>
+      <span class="stat-pill" id="historyCount" style="font-size:10px;">0</span>
+    </div>
+    <div class="tape" id="tape"><div class="tape-empty">Henüz işlem yok — bir barkod okutun</div></div>
+  </div>
+
+  <div class="search-zone">
+    <input id="searchInput" type="text" placeholder="Ürün adı veya SKU ile ara">
+    <div class="search-results" id="searchResults"></div>
+  </div>
+
+  <footer>Casalinghi · Ortak Depo Sistemi · Google Sheets ile senkron</footer>
+</div>
+
+<script>
+// ================= CONFIG =================
+const API_URL = 'https://script.google.com/macros/s/AKfycbwWQLeFzrYrP5dMcP5aW_WU5JPMRRtES3xV-BxoKE4q5vhtUoxRwl8BoDIK2dgYSjM/exec';
+// ============================================
+
+let PASSWORD = '';
+let mode = 'add';
+let catalog = [];       // [{barkod, sku, urun_adi, stok}]
+let byBarcode = {};
+let history = JSON.parse(sessionStorage.getItem('depo_history') || '[]');
+let cameraOn = false;
+let html5QrCode = null;
+
+// ---------- Login ----------
+function tryLogin(){
+  const pw = document.getElementById('pwInput').value.trim();
+  if(!pw){ document.getElementById('loginErr').textContent = 'Şifre girin'; return; }
+  PASSWORD = pw;
+  document.getElementById('loginErr').textContent = '';
+  document.getElementById('loginOverlay').classList.add('hide');
+  document.getElementById('loadingOverlay').classList.remove('hide');
+  loadCatalog();
+}
+document.getElementById('pwInput').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); });
+
+// ---------- API ----------
+async function apiCall(params){
+  const url = new URL(API_URL);
+  Object.keys(params).forEach(k => url.searchParams.set(k, params[k]));
+  url.searchParams.set('key', PASSWORD);
+  const res = await fetch(url.toString());
+  return res.json();
+}
+
+async function loadCatalog(){
+  try{
+    const data = await apiCall({ action: 'list' });
+    if(!data.ok){
+      document.getElementById('loadingOverlay').classList.add('hide');
+      document.getElementById('loginOverlay').classList.remove('hide');
+      document.getElementById('loginErr').textContent = 'Şifre yanlış veya bağlantı hatası';
+      return;
+    }
+    catalog = data.products;
+    byBarcode = {};
+    catalog.forEach(p => byBarcode[String(p.barkod).trim()] = p);
+    document.getElementById('loadingOverlay').classList.add('hide');
+    renderTotals();
+    renderHistory();
+    document.getElementById('barcodeInput').focus();
+  }catch(err){
+    document.getElementById('loadingOverlay').classList.add('hide');
+    document.getElementById('loginOverlay').classList.remove('hide');
+    document.getElementById('loginErr').textContent = 'Bağlantı hatası, tekrar deneyin';
+  }
+}
+
+// ---------- Mode ----------
+function setMode(m){
+  mode = m;
+  document.getElementById('modeAddBtn').classList.toggle('active-add', m==='add');
+  document.getElementById('modeRemoveBtn').classList.toggle('active-remove', m==='remove');
+  document.getElementById('barcodeInput').focus();
+}
+
+// ---------- Totals ----------
+function renderTotals(){
+  const total = catalog.reduce((a,p)=>a + (Number(p.stok)||0), 0);
+  document.getElementById('totalStock').textContent = 'toplam: ' + total + ' adet';
+  document.getElementById('catalogCount').textContent = catalog.length + ' ürün';
+}
+
+// ---------- Scan handler ----------
+async function handleScan(code){
+  code = (code || '').trim();
+  if(!code) return;
+  const product = byBarcode[code];
+  const card = document.getElementById('resultCard');
+
+  if(!product){
+    card.className = 'result-card show err';
+    card.innerHTML = `
+      <div class="result-name">Barkod tanınmadı</div>
+      <div class="err-text">Kod: ${escapeHtml(code)}</div>
+      <div class="scan-hint" style="margin-top:8px;">Bu barkod ürün listesinde yok.</div>
+    `;
+    resetInput();
+    return;
+  }
+
+  const delta = mode === 'add' ? 1 : -1;
+  const before = Number(product.stok) || 0;
+
+  card.className = 'result-card show';
+  card.innerHTML = `<div class="result-name">${escapeHtml(product.urun_adi)}</div><div class="scan-hint" style="margin-top:8px;">Kaydediliyor…</div>`;
+
+  try{
+    const res = await apiCall({ action: 'update', barkod: code, delta: delta });
+    if(!res.ok){
+      card.className = 'result-card show err';
+      card.innerHTML = `<div class="result-name">Hata</div><div class="err-text">${escapeHtml(res.error || 'bilinmeyen hata')}</div>`;
+      resetInput();
+      return;
+    }
+    product.stok = res.after;
+    const entry = { id: Date.now()+'-'+Math.random().toString(36).slice(2,7), barkod: code, name: product.urun_adi, sku: product.sku, delta: res.after-res.before, ts: Date.now(), stockAfter: res.after };
+    history.unshift(entry);
+    sessionStorage.setItem('depo_history', JSON.stringify(history.slice(0,60)));
+
+    renderResult(product, entry, res.before, res.after);
+    renderTotals();
+    renderHistory();
+  }catch(err){
+    card.className = 'result-card show err';
+    card.innerHTML = `<div class="result-name">Bağlantı hatası</div><div class="err-text">İnternet bağlantınızı kontrol edin</div>`;
+  }
+  resetInput();
+}
+
+function resetInput(){
+  document.getElementById('barcodeInput').value = '';
+  document.getElementById('barcodeInput').focus();
+}
+
+function renderResult(product, entry, before, after){
+  const card = document.getElementById('resultCard');
+  const isAdd = entry.delta > 0;
+  card.className = 'result-card show ok';
+  card.innerHTML = `
+    <div class="result-top">
+      <div class="result-name">${escapeHtml(product.urun_adi)}</div>
+      <div class="result-delta ${isAdd?'add':'remove'}">${isAdd?'+1':'−1'}</div>
+    </div>
+    <div class="result-meta"><span>SKU: ${escapeHtml(product.sku)}</span><span>Barkod: ${escapeHtml(product.barkod)}</span></div>
+    <div class="result-stockline">Stok: ${before} → <b>${after}</b> adet</div>
+    <button class="undo-btn" onclick="undoEntry('${entry.id}')">↩ Geri Al</button>
+  `;
+}
+
+async function undoEntry(id){
+  const idx = history.findIndex(h => h.id === id);
+  if(idx === -1) return;
+  const entry = history[idx];
+  try{
+    const res = await apiCall({ action: 'update', barkod: entry.barkod, delta: -entry.delta });
+    if(res.ok){
+      const product = byBarcode[entry.barkod];
+      if(product) product.stok = res.after;
+      history.splice(idx, 1);
+      sessionStorage.setItem('depo_history', JSON.stringify(history.slice(0,60)));
+      renderTotals();
+      renderHistory();
+      const card = document.getElementById('resultCard');
+      card.className = 'result-card show';
+      card.innerHTML = `<div class="result-name">Geri alındı</div><div class="scan-hint" style="margin-top:6px;">${escapeHtml(entry.name)} — stok: ${res.after} adet</div>`;
+    }
+  }catch(err){}
+}
+
+function renderHistory(){
+  const tape = document.getElementById('tape');
+  document.getElementById('historyCount').textContent = history.length;
+  if(history.length === 0){
+    tape.innerHTML = '<div class="tape-empty">Henüz işlem yok — bir barkod okutun</div>';
+    return;
+  }
+  tape.innerHTML = history.slice(0,25).map(h => {
+    const isAdd = h.delta > 0;
+    const time = new Date(h.ts).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+    return `
+      <div class="tape-row">
+        <div class="tape-icon ${isAdd?'add':'remove'}">${isAdd?'+':'−'}</div>
+        <div class="tape-info">
+          <div class="tape-name">${escapeHtml(h.name)}</div>
+          <div class="tape-sub">${time} · stok: ${h.stockAfter} · ${escapeHtml(h.sku)}</div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ---------- Keyboard-wedge scanner ----------
+const input = document.getElementById('barcodeInput');
+input.addEventListener('keydown', (e) => { if(e.key === 'Enter'){ e.preventDefault(); handleScan(input.value); } });
+function refocusInput(){ if(!cameraOn) input.focus(); }
+document.addEventListener('click', (e) => {
+  if(e.target.closest('.undo-btn') || e.target.closest('#searchInput') || e.target.closest('.cam-toggle') || e.target.closest('.mode-btn')) return;
+  refocusInput();
+});
+
+// ---------- Camera ----------
+async function toggleCamera(){
+  const wrap = document.getElementById('readerWrap');
+  const btn = document.getElementById('camToggle');
+  if(!cameraOn){
+    wrap.classList.add('show'); btn.classList.add('on'); cameraOn = true;
+    document.getElementById('scanHint').textContent = 'Kamera açık — barkodu çerçeveye getirin';
+    try{
+      html5QrCode = new Html5Qrcode("reader");
+      const config = { fps: 12, qrbox: { width: 260, height: 140 }, formatsToSupport: [
+        Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E,
+        Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39,
+        Html5QrcodeSupportedFormats.QR_CODE
+      ]};
+      await html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => { handleScan(decodedText); }, () => {});
+    }catch(err){
+      document.getElementById('scanHint').textContent = 'Kamera açılamadı — izin verildi mi kontrol edin';
+      cameraOn = false; btn.classList.remove('on'); wrap.classList.remove('show');
+    }
+  } else {
+    cameraOn = false; btn.classList.remove('on'); wrap.classList.remove('show');
+    document.getElementById('scanHint').textContent = 'Kablosuz/kablolu okuyucu bu kutuya otomatik yazar · Enter ile onaylanır';
+    if(html5QrCode){ try{ await html5QrCode.stop(); html5QrCode.clear(); }catch(e){} }
+    refocusInput();
+  }
+}
+
+// ---------- Search ----------
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+searchInput.addEventListener('input', () => {
+  const q = searchInput.value.trim().toLowerCase();
+  if(q.length < 2){ searchResults.classList.remove('show'); searchResults.innerHTML=''; return; }
+  const matches = catalog.filter(p =>
+    String(p.urun_adi).toLowerCase().includes(q) || String(p.sku).toLowerCase().includes(q) || String(p.barkod).toLowerCase().includes(q)
+  ).slice(0, 20);
+  searchResults.innerHTML = matches.length === 0
+    ? '<div class="tape-empty">Sonuç yok</div>'
+    : matches.map(p => `<div class="search-row"><span class="n">${escapeHtml(p.urun_adi)}</span><span class="s">${Number(p.stok)||0} adet</span></div>`).join('');
+  searchResults.classList.add('show');
+});
+</script>
+</body>
+</html>
