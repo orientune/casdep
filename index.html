@@ -44,56 +44,57 @@
   .role-pill.personel{background:var(--panel-raised); color:var(--ink-dim); border:1px solid var(--line);}
 
   /* ===== 1. Bilgi ekrani (en ustte) ===== */
-  .result-zone{padding:14px 16px 0;}
-  .result-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; min-height:96px;
+  .result-zone{padding:12px 16px 0;}
+  .result-card{background:var(--panel); border:1px solid var(--line); border-radius:13px; padding:13px; min-height:80px;
     display:flex; flex-direction:column; justify-content:center;}
   .result-card.ok{border-color:var(--green);}
   .result-card.err{border-color:var(--red);}
   .result-card.idle{align-items:center; text-align:center;}
-  .idle-text{color:var(--ink-faint); font-size:13px; font-family:var(--mono);}
+  .idle-text{color:var(--ink-faint); font-size:12.5px; font-family:var(--mono);}
   .result-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
-  .result-name{font-size:15px; font-weight:600; line-height:1.35;}
-  .result-meta{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:6px; display:flex; gap:12px; flex-wrap:wrap;}
-  .result-delta{font-family:var(--mono); font-weight:700; font-size:22px; flex-shrink:0; padding:4px 10px; border-radius:8px;}
+  .result-name{font-size:14px; font-weight:600; line-height:1.3;}
+  .result-meta{font-family:var(--mono); font-size:10px; color:var(--ink-faint); margin-top:5px; display:flex; gap:10px; flex-wrap:wrap;}
+  .result-delta{font-family:var(--mono); font-weight:700; font-size:19px; flex-shrink:0; padding:3px 9px; border-radius:8px;}
   .result-delta.add{color:var(--green); background:var(--green-dim);}
   .result-delta.remove{color:var(--red); background:var(--red-dim);}
-  .session-badge{margin-top:12px; padding:10px 12px; border-radius:9px; background:var(--amber-dim); border:1px solid var(--amber);
-    font-family:var(--mono); font-size:13px; color:var(--amber);}
-  .session-badge b{font-size:17px;}
-  .result-stockline{margin-top:10px; font-family:var(--mono); font-size:13px; color:var(--ink-dim);}
-  .result-stockline b{color:var(--ink); font-size:16px;}
+  .session-badge{margin-top:9px; padding:8px 11px; border-radius:8px; background:var(--amber-dim); border:1px solid var(--amber);
+    font-family:var(--mono); font-size:12px; color:var(--amber);}
+  .session-badge b{font-size:15px;}
+  .result-stockline{margin-top:8px; font-family:var(--mono); font-size:12px; color:var(--ink-dim);}
+  .result-stockline b{color:var(--ink); font-size:15px;}
   .countdown-line{
-    margin:0 0 12px; padding:11px 14px; border-radius:10px;
-    font-family:var(--mono); font-size:14px; font-weight:600;
-    display:flex; align-items:center; justify-content:center; gap:9px;
+    margin:0 0 10px; padding:9px 12px; border-radius:9px;
+    font-family:var(--mono); font-size:13px; font-weight:600;
+    display:flex; align-items:center; justify-content:center; gap:8px;
     background:var(--amber-dim); border:1.5px solid var(--amber); color:var(--amber);
     transition:background .25s ease, border-color .25s ease, color .25s ease;
   }
-  .countdown-line .num{font-size:22px; font-weight:700;}
-  .countdown-line .dot{width:9px; height:9px; border-radius:50%; background:var(--amber); flex-shrink:0;
+  .countdown-line .num{font-size:20px; font-weight:700;}
+  .countdown-line .dot{width:8px; height:8px; border-radius:50%; background:var(--amber); flex-shrink:0;
     animation:pulse 1s ease-in-out infinite;}
   @keyframes pulse{0%,100%{opacity:1;} 50%{opacity:.3;}}
   .countdown-line.ready{background:var(--green-dim); border-color:var(--green); color:var(--green);}
   .countdown-line.ready .dot{background:var(--green); animation:none;}
-  .undo-btn{margin-top:12px; width:100%; padding:11px; border-radius:9px; border:1px solid var(--line); background:var(--panel-raised);
-    color:var(--ink-dim); font-family:var(--sans); font-weight:600; font-size:13px; cursor:pointer;}
+  .undo-btn{margin-top:10px; width:100%; padding:10px; border-radius:9px; border:1px solid var(--line); background:var(--panel-raised);
+    color:var(--ink-dim); font-family:var(--sans); font-weight:600; font-size:12.5px; cursor:pointer;}
   .err-text{color:var(--red); font-size:13px; font-family:var(--mono); margin-top:4px;}
   .inline-action-btn{margin-top:12px; width:100%; padding:12px; border-radius:9px; border:none; background:var(--amber);
     color:#1A1500; font-family:var(--sans); font-weight:700; font-size:13.5px; cursor:pointer;}
+  .dual-actions{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px;}
 
   /* ===== 2. Kamera ===== */
   .scan-zone{padding:12px 16px 0;}
   .scan-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:12px;}
   #readerWrap{border-radius:10px; overflow:hidden; display:none; position:relative; background:#000;
-    height:210px;}
+    height:250px;}
   #readerWrap.show{display:block; margin-bottom:10px;}
   #reader{width:100%; height:100%;}
   #reader video{width:100% !important; height:100% !important; object-fit:cover !important;}
-  .scanline{position:absolute; left:11%; right:11%; height:2px; top:50%; background:var(--amber); box-shadow:0 0 10px var(--amber);
+  .scanline{position:absolute; left:9%; right:9%; height:2px; top:50%; background:var(--amber); box-shadow:0 0 10px var(--amber);
     animation:scan 1.6s ease-in-out infinite; pointer-events:none; z-index:5; opacity:1; transition:opacity .2s ease;}
   .scanline.paused{animation-play-state:paused; opacity:.22;}
-  @keyframes scan{0%,100%{top:31%;} 50%{top:69%;}}
-  .aim-frame{position:absolute; left:11%; right:11%; top:31%; bottom:31%; border:2px solid rgba(240,169,59,.7);
+  @keyframes scan{0%,100%{top:32%;} 50%{top:68%;}}
+  .aim-frame{position:absolute; left:9%; right:9%; top:32%; bottom:32%; border:2px solid rgba(240,169,59,.7);
     border-radius:5px; pointer-events:none; z-index:4;}
 
   /* ===== 3. Barkod girisi (kameranin altinda) ===== */
@@ -168,6 +169,13 @@
   .admin-box p{margin:0 0 12px; font-size:12px; color:var(--ink-faint); line-height:1.5;}
   .danger-btn{width:100%; padding:13px; border-radius:9px; border:1px solid var(--red); background:var(--red-dim);
     color:var(--red); font-family:var(--sans); font-weight:700; font-size:13.5px; cursor:pointer;}
+  .setting-box{background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:14px; margin-bottom:12px;}
+  .setting-box h3{margin:0 0 6px; font-size:13px; color:var(--amber);}
+  .setting-box p{margin:0 0 12px; font-size:12px; color:var(--ink-faint); line-height:1.5;}
+  .sec-options{display:grid; grid-template-columns:repeat(5, 1fr); gap:6px;}
+  .sec-btn{padding:12px 4px; border-radius:9px; border:1.5px solid var(--line); background:var(--panel-raised);
+    color:var(--ink-dim); font-family:var(--mono); font-size:14px; font-weight:700; cursor:pointer; text-align:center;}
+  .sec-btn.on{border-color:var(--amber); background:var(--amber-dim); color:var(--amber);}
 
   footer{text-align:center; padding:26px 16px 10px; color:var(--ink-faint); font-size:10.5px; font-family:var(--mono);}
 
@@ -307,7 +315,13 @@
   </div>
 
   <div class="tab-panel" id="panelAdmin">
-    <div class="admin-box">
+    <div class="setting-box">
+      <h3>Tarama Bekleme Süresi</h3>
+      <p>Bir ürün okutulduktan sonra kameranın kaç saniye bekleyeceğini belirler. Kısa süre hızlı sayım, uzun süre daha az yanlış okuma sağlar.</p>
+      <div class="sec-options" id="secOptions"></div>
+    </div>
+
+    <div class="admin-box" id="adminResetBox" style="display:none;">
       <h3>Tüm Depoyu Sıfırla</h3>
       <p>Tüm ürünlerin stok adedini sıfıra çeker. Bu işlem geri alınamaz — yeni bir sayıma sıfırdan başlamak için kullanın.</p>
       <button class="danger-btn" onclick="openResetAllModal()">Tüm Depoyu Sıfırla</button>
@@ -366,7 +380,7 @@ let pendingNewBarcode = null;
 let stockFilterOn = false;
 let activeTab = 'history';
 const MANUAL_DUPLICATE_GUARD_MS = 900;
-const CAMERA_RESUME_DELAY_MS = 5000;
+let countdownSeconds = Number(localStorage.getItem('depo_countdown_sec')) || 3;
 
 // ---------- Sound ----------
 let audioCtx = null;
@@ -466,7 +480,27 @@ function applyRoleUI(displayName){
   const pill = document.getElementById('rolePill');
   pill.textContent = displayName;
   pill.className = 'role-pill ' + (userRole === 'admin' ? 'admin' : userRole === 'owner' ? 'owner' : 'personel');
-  document.getElementById('tabAdminBtn').style.display = (userRole === 'admin') ? 'block' : 'none';
+  const canManage = (userRole === 'admin' || userRole === 'owner');
+  document.getElementById('tabAdminBtn').style.display = canManage ? 'block' : 'none';
+  document.getElementById('adminResetBox').style.display = (userRole === 'admin') ? 'block' : 'none';
+  renderSecOptions();
+}
+
+function renderSecOptions(){
+  const el = document.getElementById('secOptions');
+  if(!el) return;
+  el.innerHTML = [1,2,3,4,5].map(s =>
+    `<div class="sec-btn ${s===countdownSeconds?'on':''}" onclick="setCountdown(${s})">${s}s</div>`
+  ).join('');
+}
+
+function setCountdown(s){
+  countdownSeconds = s;
+  localStorage.setItem('depo_countdown_sec', String(s));
+  renderSecOptions();
+  const card = document.getElementById('resultCard');
+  card.className = 'result-card ok';
+  card.innerHTML = `<div class="result-name">Bekleme süresi: ${s} saniye</div><div class="result-stockline">Bir sonraki taramadan itibaren geçerli.</div>`;
 }
 
 // ---------- Tabs ----------
@@ -516,7 +550,10 @@ async function handleScan(code){
     card.innerHTML = `
       <div class="result-name">Barkod listede yok</div>
       <div class="err-text">${escapeHtml(code)}</div>
-      <button class="inline-action-btn" onclick="openAddProductModal()">Bu barkodu yeni ürün olarak ekle</button>
+      <div class="dual-actions">
+        <button class="modal-btn" onclick="dismissUnknown()">Yoksay</button>
+        <button class="modal-btn primary" onclick="openAddProductModal()">Yeni ürün ekle</button>
+      </div>
     `;
     resetInput();
     isProcessingScan = false;
@@ -694,6 +731,15 @@ function renderDepot(){
 }
 
 // ---------- Add new product ----------
+function dismissUnknown(){
+  pendingNewBarcode = null;
+  lastScanCode = null;
+  const card = document.getElementById('resultCard');
+  card.className = 'result-card idle';
+  card.innerHTML = `<div class="idle-text">Barkod okutulmayı bekliyor</div>`;
+  refocusInput();
+}
+
 function openAddProductModal(){
   if(!pendingNewBarcode) return;
   document.getElementById('newBarcodeDisplay').textContent = pendingNewBarcode;
@@ -817,7 +863,7 @@ async function toggleCamera(){
     document.getElementById('scanHint').textContent = 'Kamera açık — barkodu çerçeveye getirin';
     try{
       html5QrCode = new Html5Qrcode("reader");
-      const config = { fps: 12, qrbox: { width: 260, height: 100 }, formatsToSupport: [
+      const config = { fps: 12, qrbox: { width: 280, height: 120 }, formatsToSupport: [
         Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8,
         Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E,
         Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39,
@@ -849,7 +895,7 @@ async function onCameraDecode(decodedText){
 
   await handleScan(decodedText);
 
-  let remaining = Math.ceil(CAMERA_RESUME_DELAY_MS / 1000);
+  let remaining = countdownSeconds;
   const tick = () => {
     const line = document.getElementById('countdownLine');
     if(!line) return;
