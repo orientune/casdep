@@ -57,11 +57,12 @@
     color:var(--ink-dim); font-size:19px; cursor:pointer; display:flex; align-items:center; justify-content:center;}
   .cam-toggle.on{border-color:var(--amber); color:var(--amber); background:var(--amber-dim);}
   .scan-hint{font-size:11px; color:var(--ink-faint); margin-top:8px; font-family:var(--mono);}
-  #readerWrap{margin-top:12px; border-radius:10px; overflow:hidden; display:none; position:relative;}
+  #readerWrap{margin-bottom:12px; border-radius:10px; overflow:hidden; display:none; position:relative;}
   #readerWrap.show{display:block;}
   #reader{width:100%;}
   .scanline{position:absolute; left:6%; right:6%; height:2px; top:50%; background:var(--amber); box-shadow:0 0 8px var(--amber);
-    animation:scan 1.6s ease-in-out infinite; pointer-events:none; z-index:5;}
+    animation:scan 1.6s ease-in-out infinite; pointer-events:none; z-index:5; opacity:1; transition:opacity .2s ease;}
+  .scanline.paused{animation-play-state:paused; opacity:0.25;}
   @keyframes scan{0%,100%{top:20%;} 50%{top:80%;}}
 
   .result-zone{padding:14px 16px 0;}
@@ -84,6 +85,13 @@
   .result-delta.remove{color:var(--red); background:var(--red-dim);}
   .result-stockline{margin-top:12px; display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:13px; color:var(--ink-dim);}
   .result-stockline b{color:var(--ink); font-size:16px;}
+  .countdown-line{
+    margin-top:10px; font-family:var(--mono); font-size:12px; color:var(--ink-faint);
+    display:flex; align-items:center; gap:8px;
+  }
+  .countdown-line .dot{width:7px; height:7px; border-radius:50%; background:var(--amber); flex-shrink:0;}
+  .countdown-line.ready .dot{background:var(--green);}
+  .countdown-line.ready{color:var(--green);}
   .undo-btn{margin-top:12px; width:100%; padding:11px; border-radius:9px; border:1px solid var(--line); background:var(--panel-raised);
     color:var(--ink-dim); font-family:var(--sans); font-weight:600; font-size:13px; cursor:pointer;}
   .err-text{color:var(--red); font-size:13px; font-family:var(--mono); margin-top:4px;}
@@ -176,6 +184,19 @@
 </header>
 
 <div class="wrap">
+  <div class="scan-zone">
+    <div class="scan-card">
+      <div id="readerWrap"><div id="reader"></div><div class="scanline" id="scanline"></div></div>
+      <div class="scan-input-row">
+        <input id="barcodeInput" type="text" placeholder="Barkod okutun veya elle yazın" autocomplete="off" autocorrect="off" spellcheck="false">
+        <button class="cam-toggle" id="camToggle" onclick="toggleCamera()">▢</button>
+      </div>
+      <div class="scan-hint" id="scanHint">Kablosuz/kablolu okuyucu bu kutuya otomatik yazar · Enter ile onaylanır</div>
+    </div>
+  </div>
+
+  <div class="result-zone"><div class="result-card" id="resultCard"></div></div>
+
   <div class="mode-switch">
     <div class="mode-btn active-add" id="modeAddBtn" onclick="setMode('add')">
       <div class="icon">＋</div><div>DEPOYA EKLE</div>
@@ -184,19 +205,6 @@
       <div class="icon">－</div><div>DEPODAN ÇIKAR</div>
     </div>
   </div>
-
-  <div class="scan-zone">
-    <div class="scan-card">
-      <div class="scan-input-row">
-        <input id="barcodeInput" type="text" placeholder="Barkod okutun veya elle yazın" autocomplete="off" autocorrect="off" spellcheck="false">
-        <button class="cam-toggle" id="camToggle" onclick="toggleCamera()">▢</button>
-      </div>
-      <div class="scan-hint" id="scanHint">Kablosuz/kablolu okuyucu bu kutuya otomatik yazar · Enter ile onaylanır</div>
-      <div id="readerWrap"><div id="reader"></div><div class="scanline"></div></div>
-    </div>
-  </div>
-
-  <div class="result-zone"><div class="result-card" id="resultCard"></div></div>
 
   <div class="history-zone">
     <div class="history-head">
@@ -234,7 +242,7 @@ let lastScanCode = null;
 let lastScanTime = 0;
 let isProcessingScan = false;
 const MANUAL_DUPLICATE_GUARD_MS = 900;   // elle/HID girişte kaza eseri cift gönderimi önler
-const CAMERA_RESUME_DELAY_MS = 4500;     // kamera bir urun ekledikten sonra bu sure kadar durur, sonra kendi kendine devam eder
+const CAMERA_RESUME_DELAY_MS = 5000;     // kamera bir urun ekledikten sonra bu sure kadar durur, sonra kendi kendine devam eder
 let cameraResumeTimer = null;
 
 // ---------- Sound ----------
@@ -245,36 +253,37 @@ function beep(type){
     const now = audioCtx.currentTime;
 
     if(type === 'ok'){
-      // Dolgun, alcak frekansli "tok" darbesi
+      // Net, dolgun "tok-bip" - telefon hoparlorunde bogulmayacak orta frekans araligi
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(210, now);
-      osc.frequency.exponentialRampToValueAtTime(65, now + 0.11);
+      osc.frequency.setValueAtTime(480, now);
+      osc.frequency.exponentialRampToValueAtTime(340, now + 0.09);
       gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.linearRampToValueAtTime(0.55, now + 0.008);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.19);
+      gain.gain.linearRampToValueAtTime(0.45, now + 0.006);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
       osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(now); osc.stop(now + 0.2);
+      osc.start(now); osc.stop(now + 0.16);
 
-      // Darbenin basini belirginlestiren kisa tik katmani
+      // Ustune net bir vurgu/parlaklik katmani (bogukluk vermez, netlik katar)
       const click = audioCtx.createOscillator();
       const clickGain = audioCtx.createGain();
       click.type = 'triangle';
-      click.frequency.setValueAtTime(700, now);
-      clickGain.gain.setValueAtTime(0.08, now);
-      clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
+      click.frequency.setValueAtTime(960, now);
+      clickGain.gain.setValueAtTime(0.16, now);
+      clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
       click.connect(clickGain); clickGain.connect(audioCtx.destination);
-      click.start(now); click.stop(now + 0.03);
+      click.start(now); click.stop(now + 0.05);
 
     } else if(type === 'error'){
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(150, now);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.linearRampToValueAtTime(160, now + 0.3);
       gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.linearRampToValueAtTime(0.28, now + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.38);
+      gain.gain.linearRampToValueAtTime(0.22, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
       osc.connect(gain); gain.connect(audioCtx.destination);
       osc.start(now); osc.stop(now + 0.39);
     }
@@ -432,6 +441,7 @@ function renderResult(product, entry, before, after){
     <div class="result-meta"><span>SKU: ${escapeHtml(product.sku)}</span><span>Barkod: ${escapeHtml(product.barkod)}</span></div>
     <div class="session-badge">Bu oturumda bu üründen: <b>${sessionSign}${sessionTotal}</b> adet</div>
     <div class="result-stockline">Depo stoğu: ${before} → <b>${after}</b> adet</div>
+    <div class="countdown-line" id="countdownLine"></div>
     <button class="undo-btn" onclick="undoEntry('${entry.id}')">↩ Geri Al</button>
   `;
 }
@@ -549,13 +559,28 @@ async function onCameraDecode(decodedText){
   if(cameraResumeTimer) return; // zaten bekleme/geri sayim asamasindaysa yeni okumayi yoksay
 
   try{ await html5QrCode.pause(true); }catch(e){}
+  const scanlineEl = document.getElementById('scanline');
+  if(scanlineEl) scanlineEl.classList.add('paused');
   const hint = document.getElementById('scanHint');
   hint.textContent = 'İşleniyor…';
 
   await handleScan(decodedText);
 
   let remaining = Math.ceil(CAMERA_RESUME_DELAY_MS / 1000);
+  const tickCountdown = () => {
+    const line = document.getElementById('countdownLine');
+    if(!line) return;
+    if(remaining > 0){
+      line.className = 'countdown-line';
+      line.innerHTML = `<span class="dot"></span> Yeni ürün için hazırlanıyor… ${remaining}s`;
+    } else {
+      line.className = 'countdown-line ready';
+      line.innerHTML = `<span class="dot"></span> Yeni ürün eklenecek`;
+    }
+  };
+  tickCountdown();
   hint.textContent = `Sonraki taramaya hazırlanıyor… (${remaining}s)`;
+
   cameraResumeTimer = setInterval(() => {
     remaining -= 1;
     if(!cameraOn){
@@ -565,9 +590,12 @@ async function onCameraDecode(decodedText){
     if(remaining <= 0){
       clearInterval(cameraResumeTimer); cameraResumeTimer = null;
       try{ html5QrCode.resume(); }catch(e){}
+      if(scanlineEl) scanlineEl.classList.remove('paused');
       hint.textContent = 'Kamera açık — barkodu çerçeveye getirin';
+      tickCountdown();
     } else {
       hint.textContent = `Sonraki taramaya hazırlanıyor… (${remaining}s)`;
+      tickCountdown();
     }
   }, 1000);
 }
