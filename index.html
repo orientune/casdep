@@ -149,8 +149,10 @@
     <div class="brand-mark"></div>
     <h2>Depo Tarama</h2>
     <p>Erişmek için şifreyi girin</p>
-    <input id="pwInput" type="password" placeholder="Şifre" autocomplete="off">
-    <button id="loginBtn" onclick="tryLogin()">Giriş Yap</button>
+    <form id="loginForm">
+      <input id="pwInput" type="password" inputmode="text" placeholder="Şifre" autocomplete="off" enterkeyhint="go">
+      <button id="loginBtn" type="submit">Giriş Yap</button>
+    </form>
     <div id="loginErr"></div>
   </div>
 </div>
@@ -285,11 +287,12 @@ function tryLogin(){
   if(!pw){ document.getElementById('loginErr').textContent = 'Şifre girin'; return; }
   PASSWORD = pw;
   document.getElementById('loginErr').textContent = '';
+  document.getElementById('pwInput').blur(); // klavyeyi kapat
   document.getElementById('loginOverlay').classList.add('hide');
   document.getElementById('loadingOverlay').classList.remove('hide');
   loadCatalog();
 }
-document.getElementById('pwInput').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); });
+document.getElementById('loginForm').addEventListener('submit', (e) => { e.preventDefault(); tryLogin(); });
 
 // ---------- API ----------
 async function apiCall(params){
