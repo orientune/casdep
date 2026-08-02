@@ -204,6 +204,34 @@ let byBarcode = {};
 let history = JSON.parse(sessionStorage.getItem('depo_history') || '[]');
 let cameraOn = false;
 let html5QrCode = null;
+let lastScanCode = null;
+let lastScanTime = 0;
+let isProcessingScan = false;
+const SCAN_COOLDOWN_MS = 2500;
+
+// ---------- Sound ----------
+let audioCtx = null;
+function beep(type){
+  try{
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain); gain.connect(audioCtx.destination);
+
+    if(type === 'ok'){
+      osc.frequency.setValueAtTime(1400, now);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      osc.start(now); osc.stop(now + 0.13);
+    } else if(type === 'error'){
+      osc.frequency.setValueAtTime(320, now);
+      gain.gain.setValueAtTime(0.15, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+      osc.start(now); osc.stop(now + 0.3);
+    }
+  }catch(e){}
+}
 
 // ---------- Login ----------
 function tryLogin(){
@@ -268,10 +296,19 @@ function renderTotals(){
 async function handleScan(code){
   code = (code || '').trim();
   if(!code) return;
+
+  const now = Date.now();
+  if(isProcessingScan) return;
+  if(code === lastScanCode && (now - lastScanTime) < SCAN_COOLDOWN_MS) return;
+  lastScanCode = code;
+  lastScanTime = now;
+  isProcessingScan = true;
+
   const product = byBarcode[code];
   const card = document.getElementById('resultCard');
 
   if(!product){
+    beep('error');
     card.className = 'result-card show err';
     card.innerHTML = `
       <div class="result-name">Barkod tanınmadı</div>
@@ -279,6 +316,7 @@ async function handleScan(code){
       <div class="scan-hint" style="margin-top:8px;">Bu barkod ürün listesinde yok.</div>
     `;
     resetInput();
+    isProcessingScan = false;
     return;
   }
 
@@ -291,11 +329,14 @@ async function handleScan(code){
   try{
     const res = await apiCall({ action: 'update', barkod: code, delta: delta });
     if(!res.ok){
+      beep('error');
       card.className = 'result-card show err';
       card.innerHTML = `<div class="result-name">Hata</div><div class="err-text">${escapeHtml(res.error || 'bilinmeyen hata')}</div>`;
       resetInput();
+      isProcessingScan = false;
       return;
     }
+    beep('ok');
     product.stok = res.after;
     const entry = { id: Date.now()+'-'+Math.random().toString(36).slice(2,7), barkod: code, name: product.urun_adi, sku: product.sku, delta: res.after-res.before, ts: Date.now(), stockAfter: res.after };
     history.unshift(entry);
@@ -309,6 +350,7 @@ async function handleScan(code){
     card.innerHTML = `<div class="result-name">Bağlantı hatası</div><div class="err-text">İnternet bağlantınızı kontrol edin</div>`;
   }
   resetInput();
+  isProcessingScan = false;
 }
 
 function resetInput(){
