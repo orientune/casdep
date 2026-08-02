@@ -73,6 +73,12 @@
   .result-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
   .result-name{font-size:15px; font-weight:600; line-height:1.35;}
   .result-meta{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:6px; display:flex; gap:12px; flex-wrap:wrap;}
+  .session-badge{
+    margin-top:12px; padding:10px 12px; border-radius:9px;
+    background:var(--amber-dim); border:1px solid var(--amber);
+    font-family:var(--mono); font-size:13px; color:var(--amber);
+  }
+  .session-badge b{font-size:17px;}
   .result-delta{font-family:var(--mono); font-weight:700; font-size:22px; flex-shrink:0; padding:4px 10px; border-radius:8px;}
   .result-delta.add{color:var(--green); background:var(--green-dim);}
   .result-delta.remove{color:var(--red); background:var(--red-dim);}
@@ -85,6 +91,11 @@
   .history-zone{padding:20px 16px 0;}
   .history-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
   .history-head h2{font-size:12px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-faint); margin:0; font-weight:600;}
+  .reset-session-btn{
+    font-family:var(--mono); font-size:10px; color:var(--ink-faint); background:none;
+    border:1px solid var(--line); border-radius:6px; padding:5px 8px; cursor:pointer;
+  }
+  .reset-session-btn:active{background:var(--panel-raised);}
   .tape{background:var(--panel); border:1px solid var(--line); border-radius:12px; max-height:340px; overflow-y:auto;}
   .tape-row{display:flex; align-items:center; gap:10px; padding:11px 14px; border-bottom:1px dashed var(--line); font-size:13px;}
   .tape-row:last-child{border-bottom:none;}
@@ -93,6 +104,7 @@
   .tape-icon.remove{background:var(--red-dim); color:var(--red);}
   .tape-info{flex:1; min-width:0;}
   .tape-name{font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--ink);}
+  .tape-count{font-family:var(--mono); color:var(--amber); font-weight:700; font-size:11px;}
   .tape-sub{font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); margin-top:2px;}
   .tape-empty{padding:24px 14px; text-align:center; color:var(--ink-faint); font-size:12.5px;}
 
@@ -187,7 +199,10 @@
   <div class="history-zone">
     <div class="history-head">
       <h2>Son İşlemler</h2>
-      <span class="stat-pill" id="historyCount" style="font-size:10px;">0</span>
+      <div style="display:flex; gap:6px; align-items:center;">
+        <button class="reset-session-btn" onclick="resetSession()">Oturumu Sıfırla</button>
+        <span class="stat-pill" id="historyCount" style="font-size:10px;">0</span>
+      </div>
     </div>
     <div class="tape" id="tape"><div class="tape-empty">Henüz işlem yok — bir barkod okutun</div></div>
   </div>
@@ -210,6 +225,7 @@ let mode = 'add';
 let catalog = [];       // [{barkod, sku, urun_adi, stok}]
 let byBarcode = {};
 let history = JSON.parse(sessionStorage.getItem('depo_history') || '[]');
+let sessionCounts = JSON.parse(sessionStorage.getItem('depo_session_counts') || '{}'); // barkod -> bu oturumdaki net degisim
 let cameraOn = false;
 let html5QrCode = null;
 let lastScanCode = null;
@@ -350,6 +366,9 @@ async function handleScan(code){
     history.unshift(entry);
     sessionStorage.setItem('depo_history', JSON.stringify(history.slice(0,60)));
 
+    sessionCounts[code] = (sessionCounts[code] || 0) + entry.delta;
+    sessionStorage.setItem('depo_session_counts', JSON.stringify(sessionCounts));
+
     renderResult(product, entry, res.before, res.after);
     renderTotals();
     renderHistory();
@@ -361,6 +380,14 @@ async function handleScan(code){
   isProcessingScan = false;
 }
 
+function resetSession(){
+  sessionCounts = {};
+  sessionStorage.setItem('depo_session_counts', '{}');
+  const card = document.getElementById('resultCard');
+  card.className = 'result-card show';
+  card.innerHTML = `<div class="result-name">Oturum sıfırlandı</div><div class="scan-hint" style="margin-top:6px;">Yeni parti için sayaçlar 0'dan başlıyor. Depo stoğu değişmedi.</div>`;
+}
+
 function resetInput(){
   document.getElementById('barcodeInput').value = '';
   document.getElementById('barcodeInput').focus();
@@ -369,6 +396,8 @@ function resetInput(){
 function renderResult(product, entry, before, after){
   const card = document.getElementById('resultCard');
   const isAdd = entry.delta > 0;
+  const sessionTotal = sessionCounts[entry.barkod] || 0;
+  const sessionSign = sessionTotal > 0 ? '+' : '';
   card.className = 'result-card show ok';
   card.innerHTML = `
     <div class="result-top">
@@ -376,7 +405,8 @@ function renderResult(product, entry, before, after){
       <div class="result-delta ${isAdd?'add':'remove'}">${isAdd?'+1':'−1'}</div>
     </div>
     <div class="result-meta"><span>SKU: ${escapeHtml(product.sku)}</span><span>Barkod: ${escapeHtml(product.barkod)}</span></div>
-    <div class="result-stockline">Stok: ${before} → <b>${after}</b> adet</div>
+    <div class="session-badge">Bu oturumda bu üründen: <b>${sessionSign}${sessionTotal}</b> adet</div>
+    <div class="result-stockline">Depo stoğu: ${before} → <b>${after}</b> adet</div>
     <button class="undo-btn" onclick="undoEntry('${entry.id}')">↩ Geri Al</button>
   `;
 }
@@ -392,6 +422,10 @@ async function undoEntry(id){
       if(product) product.stok = res.after;
       history.splice(idx, 1);
       sessionStorage.setItem('depo_history', JSON.stringify(history.slice(0,60)));
+
+      sessionCounts[entry.barkod] = (sessionCounts[entry.barkod] || 0) - entry.delta;
+      sessionStorage.setItem('depo_session_counts', JSON.stringify(sessionCounts));
+
       renderTotals();
       renderHistory();
       const card = document.getElementById('resultCard');
@@ -408,15 +442,35 @@ function renderHistory(){
     tape.innerHTML = '<div class="tape-empty">Henüz işlem yok — bir barkod okutun</div>';
     return;
   }
-  tape.innerHTML = history.slice(0,25).map(h => {
-    const isAdd = h.delta > 0;
-    const time = new Date(h.ts).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+
+  // ardisik ayni barkod girislerini grupla (en yeni en ustte oldugu icin ardisik = zaman olarak yakin ayni urun)
+  const recent = history.slice(0, 60);
+  const groups = [];
+  for(const h of recent){
+    const last = groups[groups.length - 1];
+    if(last && last.barkod === h.barkod && Math.sign(last.netDelta) === Math.sign(h.delta)){
+      last.count += 1;
+      last.netDelta += h.delta;
+      last.ids.push(h.id);
+    } else {
+      groups.push({
+        barkod: h.barkod, name: h.name, sku: h.sku,
+        count: 1, netDelta: h.delta, stockAfter: h.stockAfter,
+        ts: h.ts, ids: [h.id]
+      });
+    }
+  }
+
+  tape.innerHTML = groups.slice(0, 25).map(g => {
+    const isAdd = g.netDelta > 0;
+    const time = new Date(g.ts).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
+    const countBadge = g.count > 1 ? ` <span class="tape-count">×${g.count}</span>` : '';
     return `
       <div class="tape-row">
         <div class="tape-icon ${isAdd?'add':'remove'}">${isAdd?'+':'−'}</div>
         <div class="tape-info">
-          <div class="tape-name">${escapeHtml(h.name)}</div>
-          <div class="tape-sub">${time} · stok: ${h.stockAfter} · ${escapeHtml(h.sku)}</div>
+          <div class="tape-name">${escapeHtml(g.name)}${countBadge}</div>
+          <div class="tape-sub">${time} · stok: ${g.stockAfter} · ${escapeHtml(g.sku)}</div>
         </div>
       </div>`;
   }).join('');
