@@ -29,82 +29,97 @@
   body{min-height:100vh; padding-bottom:40px;}
   .wrap{max-width:520px; margin:0 auto; padding:0 16px;}
 
-  header{padding:18px 16px 14px; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:50; background:var(--bg);}
-  .header-row{max-width:520px; margin:0 auto; display:flex; align-items:center; justify-content:space-between;}
-  .brand{display:flex; align-items:center; gap:10px;}
-  .brand-mark{width:30px; height:30px; border-radius:6px;
-    background: repeating-linear-gradient(90deg, var(--amber) 0px, var(--amber) 2px, transparent 2px, transparent 4px, var(--ink) 4px, var(--ink) 5px, transparent 5px, transparent 8px);
-    flex-shrink:0;}
-  .brand h1{font-size:16px; margin:0; font-weight:600;}
-  .brand .sub{font-size:11px; color:var(--ink-faint); font-family:var(--mono); margin-top:1px;}
-  .stat-pill{font-family:var(--mono); font-size:11px; color:var(--ink-dim); background:var(--panel); border:1px solid var(--line); padding:5px 10px; border-radius:20px;}
+  header{padding:14px 16px 12px; border-bottom:1px solid var(--line); position:sticky; top:0; z-index:50; background:var(--bg);}
+  .header-row{max-width:520px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .brand{display:flex; align-items:center; gap:9px; min-width:0;}
+  .brand-mark{width:26px; height:26px; border-radius:6px; flex-shrink:0;
+    background: repeating-linear-gradient(90deg, var(--amber) 0px, var(--amber) 2px, transparent 2px, transparent 4px, var(--ink) 4px, var(--ink) 5px, transparent 5px, transparent 8px);}
+  .brand h1{font-size:15px; margin:0; font-weight:600;}
+  .brand .sub{font-size:10px; color:var(--ink-faint); font-family:var(--mono); margin-top:1px;}
+  .header-right{display:flex; align-items:center; gap:6px; flex-shrink:0;}
+  .stat-pill{font-family:var(--mono); font-size:10.5px; color:var(--ink-dim); background:var(--panel); border:1px solid var(--line); padding:5px 9px; border-radius:20px; white-space:nowrap;}
+  .role-pill{font-family:var(--mono); font-size:9.5px; padding:4px 8px; border-radius:20px; font-weight:700; letter-spacing:.5px; text-transform:uppercase;}
+  .role-pill.admin{background:var(--red-dim); color:var(--red); border:1px solid var(--red);}
+  .role-pill.owner{background:var(--amber-dim); color:var(--amber); border:1px solid var(--amber);}
+  .role-pill.personel{background:var(--panel-raised); color:var(--ink-dim); border:1px solid var(--line);}
 
-  .mode-switch{display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:14px 16px 0;}
-  .mode-btn{padding:16px 8px; border-radius:12px; border:1.5px solid var(--line); background:var(--panel); color:var(--ink-dim);
-    font-family:var(--sans); font-weight:600; font-size:14px; display:flex; flex-direction:column; align-items:center; gap:4px;
-    cursor:pointer; transition:all .15s ease; user-select:none;}
-  .mode-btn .icon{font-size:20px; line-height:1;}
-  .mode-btn.active-add{background:var(--green-dim); border-color:var(--green); color:var(--green);}
-  .mode-btn.active-remove{background:var(--red-dim); border-color:var(--red); color:var(--red);}
-
-  .scan-zone{padding:14px 16px 0;}
-  .scan-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px; position:relative; overflow:hidden;}
-  .scan-input-row{display:flex; gap:8px;}
-  #barcodeInput{flex:1; background:var(--panel-raised); border:1.5px solid var(--line); border-radius:10px; color:var(--ink);
-    font-family:var(--mono); font-size:15px; padding:13px 12px; outline:none;}
-  #barcodeInput:focus{border-color:var(--amber);}
-  .cam-toggle{width:48px; flex-shrink:0; border-radius:10px; border:1.5px solid var(--line); background:var(--panel-raised);
-    color:var(--ink-dim); font-size:19px; cursor:pointer; display:flex; align-items:center; justify-content:center;}
-  .cam-toggle.on{border-color:var(--amber); color:var(--amber); background:var(--amber-dim);}
-  .scan-hint{font-size:11px; color:var(--ink-faint); margin-top:8px; font-family:var(--mono);}
-  #readerWrap{margin-bottom:12px; border-radius:10px; overflow:hidden; display:none; position:relative;}
-  #readerWrap.show{display:block;}
-  #reader{width:100%;}
-  .scanline{position:absolute; left:6%; right:6%; height:2px; top:50%; background:var(--amber); box-shadow:0 0 8px var(--amber);
-    animation:scan 1.6s ease-in-out infinite; pointer-events:none; z-index:5; opacity:1; transition:opacity .2s ease;}
-  .scanline.paused{animation-play-state:paused; opacity:0.25;}
-  @keyframes scan{0%,100%{top:20%;} 50%{top:80%;}}
-
+  /* ===== 1. Bilgi ekrani (en ustte) ===== */
   .result-zone{padding:14px 16px 0;}
-  .result-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; display:none;}
-  .result-card.show{display:block; animation:pop .2s ease;}
-  @keyframes pop{from{transform:scale(.97); opacity:0;} to{transform:scale(1); opacity:1;}}
+  .result-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:16px; min-height:96px;
+    display:flex; flex-direction:column; justify-content:center;}
   .result-card.ok{border-color:var(--green);}
   .result-card.err{border-color:var(--red);}
+  .result-card.idle{align-items:center; text-align:center;}
+  .idle-text{color:var(--ink-faint); font-size:13px; font-family:var(--mono);}
   .result-top{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
   .result-name{font-size:15px; font-weight:600; line-height:1.35;}
   .result-meta{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-top:6px; display:flex; gap:12px; flex-wrap:wrap;}
-  .session-badge{
-    margin-top:12px; padding:10px 12px; border-radius:9px;
-    background:var(--amber-dim); border:1px solid var(--amber);
-    font-family:var(--mono); font-size:13px; color:var(--amber);
-  }
-  .session-badge b{font-size:17px;}
   .result-delta{font-family:var(--mono); font-weight:700; font-size:22px; flex-shrink:0; padding:4px 10px; border-radius:8px;}
   .result-delta.add{color:var(--green); background:var(--green-dim);}
   .result-delta.remove{color:var(--red); background:var(--red-dim);}
-  .result-stockline{margin-top:12px; display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:13px; color:var(--ink-dim);}
+  .session-badge{margin-top:12px; padding:10px 12px; border-radius:9px; background:var(--amber-dim); border:1px solid var(--amber);
+    font-family:var(--mono); font-size:13px; color:var(--amber);}
+  .session-badge b{font-size:17px;}
+  .result-stockline{margin-top:10px; font-family:var(--mono); font-size:13px; color:var(--ink-dim);}
   .result-stockline b{color:var(--ink); font-size:16px;}
-  .countdown-line{
-    margin-top:10px; font-family:var(--mono); font-size:12px; color:var(--ink-faint);
-    display:flex; align-items:center; gap:8px;
-  }
+  .countdown-line{margin-top:10px; font-family:var(--mono); font-size:12px; color:var(--ink-faint); display:flex; align-items:center; gap:8px;}
   .countdown-line .dot{width:7px; height:7px; border-radius:50%; background:var(--amber); flex-shrink:0;}
-  .countdown-line.ready .dot{background:var(--green);}
   .countdown-line.ready{color:var(--green);}
+  .countdown-line.ready .dot{background:var(--green);}
   .undo-btn{margin-top:12px; width:100%; padding:11px; border-radius:9px; border:1px solid var(--line); background:var(--panel-raised);
     color:var(--ink-dim); font-family:var(--sans); font-weight:600; font-size:13px; cursor:pointer;}
   .err-text{color:var(--red); font-size:13px; font-family:var(--mono); margin-top:4px;}
+  .inline-action-btn{margin-top:12px; width:100%; padding:12px; border-radius:9px; border:none; background:var(--amber);
+    color:#1A1500; font-family:var(--sans); font-weight:700; font-size:13.5px; cursor:pointer;}
 
-  .history-zone{padding:20px 16px 0;}
-  .history-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;}
-  .history-head h2{font-size:12px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-faint); margin:0; font-weight:600;}
-  .reset-session-btn{
-    font-family:var(--mono); font-size:10px; color:var(--ink-faint); background:none;
-    border:1px solid var(--line); border-radius:6px; padding:5px 8px; cursor:pointer;
-  }
-  .reset-session-btn:active{background:var(--panel-raised);}
-  .tape{background:var(--panel); border:1px solid var(--line); border-radius:12px; max-height:340px; overflow-y:auto;}
+  /* ===== 2. Kamera ===== */
+  .scan-zone{padding:12px 16px 0;}
+  .scan-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:12px;}
+  #readerWrap{border-radius:10px; overflow:hidden; display:none; position:relative; background:#000;}
+  #readerWrap.show{display:block; margin-bottom:10px;}
+  #reader{width:100%;}
+  .scanline{position:absolute; left:8%; right:8%; height:2px; top:50%; background:var(--amber); box-shadow:0 0 10px var(--amber);
+    animation:scan 1.6s ease-in-out infinite; pointer-events:none; z-index:5; opacity:1; transition:opacity .2s ease;}
+  .scanline.paused{animation-play-state:paused; opacity:.22;}
+  @keyframes scan{0%,100%{top:22%;} 50%{top:78%;}}
+  .aim-frame{position:absolute; left:8%; right:8%; top:22%; bottom:22%; border:2px solid rgba(240,169,59,.55);
+    border-radius:6px; pointer-events:none; z-index:4;}
+
+  /* ===== 3. Barkod girisi (kameranin altinda) ===== */
+  .scan-input-row{display:flex; gap:8px;}
+  #barcodeInput{flex:1; background:var(--panel-raised); border:1.5px solid var(--line); border-radius:10px; color:var(--ink);
+    font-family:var(--mono); font-size:15px; padding:13px 12px; outline:none; min-width:0;}
+  #barcodeInput:focus{border-color:var(--amber);}
+  .cam-toggle{width:48px; flex-shrink:0; border-radius:10px; border:1.5px solid var(--line); background:var(--panel-raised);
+    color:var(--ink-dim); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center;}
+  .cam-toggle.on{border-color:var(--amber); color:var(--amber); background:var(--amber-dim);}
+  .scan-hint{font-size:11px; color:var(--ink-faint); margin-top:8px; font-family:var(--mono);}
+
+  /* ===== 4. Mod butonlari ===== */
+  .mode-switch{display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:12px 16px 0;}
+  .mode-btn{padding:15px 8px; border-radius:12px; border:1.5px solid var(--line); background:var(--panel); color:var(--ink-dim);
+    font-family:var(--sans); font-weight:600; font-size:13.5px; display:flex; flex-direction:column; align-items:center; gap:4px;
+    cursor:pointer; transition:all .15s ease; user-select:none;}
+  .mode-btn .icon{font-size:19px; line-height:1;}
+  .mode-btn.active-add{background:var(--green-dim); border-color:var(--green); color:var(--green);}
+  .mode-btn.active-remove{background:var(--red-dim); border-color:var(--red); color:var(--red);}
+
+  /* ===== Sekmeler ===== */
+  .tabs{display:flex; gap:6px; padding:20px 16px 0;}
+  .tab{flex:1; padding:10px 6px; border-radius:9px; border:1px solid var(--line); background:var(--panel);
+    color:var(--ink-faint); font-family:var(--mono); font-size:11px; text-align:center; cursor:pointer; user-select:none;}
+  .tab.active{background:var(--panel-raised); color:var(--ink); border-color:var(--amber);}
+  .tab-panel{display:none; padding:10px 16px 0;}
+  .tab-panel.show{display:block;}
+
+  /* Gecmis */
+  .history-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:8px;}
+  .history-head h2{font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--ink-faint); margin:0; font-weight:600;}
+  .small-btn{font-family:var(--mono); font-size:10px; color:var(--ink-faint); background:none; border:1px solid var(--line);
+    border-radius:6px; padding:5px 8px; cursor:pointer;}
+  .small-btn:active{background:var(--panel-raised);}
+  .small-btn.danger{color:var(--red); border-color:var(--red-dim);}
+  .tape{background:var(--panel); border:1px solid var(--line); border-radius:12px; max-height:320px; overflow-y:auto;}
   .tape-row{display:flex; align-items:center; gap:10px; padding:11px 14px; border-bottom:1px dashed var(--line); font-size:13px;}
   .tape-row:last-child{border-bottom:none;}
   .tape-icon{width:26px; height:26px; border-radius:7px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700;}
@@ -116,20 +131,36 @@
   .tape-sub{font-family:var(--mono); font-size:10.5px; color:var(--ink-faint); margin-top:2px;}
   .tape-empty{padding:24px 14px; text-align:center; color:var(--ink-faint); font-size:12.5px;}
 
-  .search-zone{padding:20px 16px 0;}
-  #searchInput{width:100%; background:var(--panel); border:1px solid var(--line); border-radius:10px; color:var(--ink);
-    font-family:var(--sans); font-size:13px; padding:10px 12px; outline:none;}
-  #searchInput:focus{border-color:var(--amber);}
-  .search-results{margin-top:8px; max-height:220px; overflow-y:auto; display:none;}
-  .search-results.show{display:block;}
-  .search-row{display:flex; justify-content:space-between; align-items:center; gap:8px; padding:9px 12px; background:var(--panel);
-    border:1px solid var(--line); border-radius:9px; margin-bottom:6px; font-size:12.5px;}
-  .search-row .n{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;}
-  .search-row .s{font-family:var(--mono); color:var(--amber); font-weight:600; flex-shrink:0;}
+  /* Depo listesi */
+  .depot-controls{display:flex; gap:6px; margin-bottom:8px;}
+  #depotSearch{flex:1; background:var(--panel); border:1px solid var(--line); border-radius:9px; color:var(--ink);
+    font-family:var(--sans); font-size:12.5px; padding:9px 11px; outline:none; min-width:0;}
+  #depotSearch:focus{border-color:var(--amber);}
+  .filter-btn{font-family:var(--mono); font-size:10px; color:var(--ink-faint); background:var(--panel);
+    border:1px solid var(--line); border-radius:9px; padding:0 10px; cursor:pointer; white-space:nowrap;}
+  .filter-btn.on{border-color:var(--amber); color:var(--amber);}
+  .depot-list{background:var(--panel); border:1px solid var(--line); border-radius:12px; max-height:400px; overflow-y:auto;}
+  .depot-row{display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 13px;
+    border-bottom:1px dashed var(--line);}
+  .depot-row:last-child{border-bottom:none;}
+  .depot-info{flex:1; min-width:0;}
+  .depot-name{font-size:12.5px; line-height:1.3; color:var(--ink);}
+  .depot-sub{font-family:var(--mono); font-size:10px; color:var(--ink-faint); margin-top:3px;}
+  .depot-qty{font-family:var(--mono); font-size:15px; font-weight:700; flex-shrink:0; padding:4px 9px; border-radius:7px;}
+  .depot-qty.has{background:var(--green-dim); color:var(--green);}
+  .depot-qty.zero{background:var(--panel-raised); color:var(--ink-faint);}
+  .depot-summary{font-family:var(--mono); font-size:11px; color:var(--ink-faint); margin-bottom:8px;}
+
+  /* Admin panel */
+  .admin-box{background:var(--panel); border:1px solid var(--red-dim); border-radius:12px; padding:14px;}
+  .admin-box h3{margin:0 0 6px; font-size:13px; color:var(--red);}
+  .admin-box p{margin:0 0 12px; font-size:12px; color:var(--ink-faint); line-height:1.5;}
+  .danger-btn{width:100%; padding:13px; border-radius:9px; border:1px solid var(--red); background:var(--red-dim);
+    color:var(--red); font-family:var(--sans); font-weight:700; font-size:13.5px; cursor:pointer;}
 
   footer{text-align:center; padding:26px 16px 10px; color:var(--ink-faint); font-size:10.5px; font-family:var(--mono);}
 
-  /* Login overlay */
+  /* Login */
   #loginOverlay{position:fixed; inset:0; background:var(--bg); z-index:200; display:flex; align-items:center; justify-content:center; padding:20px;}
   .login-box{width:100%; max-width:340px; text-align:center;}
   .login-box .brand-mark{width:44px; height:44px; margin:0 auto 16px; border-radius:9px;}
@@ -142,12 +173,28 @@
     font-family:var(--sans); font-weight:700; font-size:14px; cursor:pointer;}
   #loginErr{color:var(--red); font-size:12px; margin-top:10px; font-family:var(--mono); min-height:16px;}
 
-  /* Loading overlay */
   #loadingOverlay{position:fixed; inset:0; background:var(--bg); z-index:150; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:14px;}
   .spinner{width:34px; height:34px; border-radius:50%; border:3px solid var(--line); border-top-color:var(--amber); animation:spin .8s linear infinite;}
   @keyframes spin{to{transform:rotate(360deg);}}
   #loadingOverlay p{color:var(--ink-faint); font-size:12.5px; font-family:var(--mono);}
   #loadingOverlay.hide, #loginOverlay.hide{display:none;}
+
+  /* Modal */
+  .modal-backdrop{position:fixed; inset:0; background:rgba(10,11,13,.8); z-index:180; display:none; align-items:center; justify-content:center; padding:20px;}
+  .modal-backdrop.show{display:flex;}
+  .modal{width:100%; max-width:360px; background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px;}
+  .modal h3{margin:0 0 6px; font-size:15px;}
+  .modal p{margin:0 0 14px; font-size:12.5px; color:var(--ink-faint); line-height:1.5;}
+  .modal input{width:100%; background:var(--panel-raised); border:1.5px solid var(--line); border-radius:9px; color:var(--ink);
+    font-family:var(--sans); font-size:14px; padding:12px; outline:none; margin-bottom:9px;}
+  .modal input:focus{border-color:var(--amber);}
+  .modal-actions{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:4px;}
+  .modal-btn{padding:12px; border-radius:9px; border:1px solid var(--line); background:var(--panel-raised); color:var(--ink-dim);
+    font-family:var(--sans); font-weight:600; font-size:13px; cursor:pointer;}
+  .modal-btn.primary{background:var(--amber); color:#1A1500; border:none; font-weight:700;}
+  .modal-btn.danger{background:var(--red-dim); color:var(--red); border-color:var(--red); font-weight:700;}
+  .modal-code{font-family:var(--mono); font-size:11.5px; color:var(--amber); background:var(--panel-raised);
+    padding:8px 10px; border-radius:7px; margin-bottom:10px; word-break:break-all;}
 </style>
 </head>
 <body>
@@ -179,14 +226,30 @@
         <div class="sub" id="catalogCount">— ürün</div>
       </div>
     </div>
-    <div class="stat-pill" id="totalStock">toplam: —</div>
+    <div class="header-right">
+      <span class="role-pill personel" id="rolePill">—</span>
+      <span class="stat-pill" id="totalStock">—</span>
+    </div>
   </div>
 </header>
 
 <div class="wrap">
+
+  <!-- 1. BILGI EKRANI -->
+  <div class="result-zone">
+    <div class="result-card idle" id="resultCard">
+      <div class="idle-text">Barkod okutulmayı bekliyor</div>
+    </div>
+  </div>
+
+  <!-- 2. KAMERA + 3. BARKOD GIRISI -->
   <div class="scan-zone">
     <div class="scan-card">
-      <div id="readerWrap"><div id="reader"></div><div class="scanline" id="scanline"></div></div>
+      <div id="readerWrap">
+        <div id="reader"></div>
+        <div class="aim-frame"></div>
+        <div class="scanline" id="scanline"></div>
+      </div>
       <div class="scan-input-row">
         <input id="barcodeInput" type="text" placeholder="Barkod okutun veya elle yazın" autocomplete="off" autocorrect="off" spellcheck="false">
         <button class="cam-toggle" id="camToggle" onclick="toggleCamera()">▢</button>
@@ -195,8 +258,7 @@
     </div>
   </div>
 
-  <div class="result-zone"><div class="result-card" id="resultCard"></div></div>
-
+  <!-- 4. MOD BUTONLARI -->
   <div class="mode-switch">
     <div class="mode-btn active-add" id="modeAddBtn" onclick="setMode('add')">
       <div class="icon">＋</div><div>DEPOYA EKLE</div>
@@ -206,44 +268,95 @@
     </div>
   </div>
 
-  <div class="history-zone">
+  <!-- SEKMELER -->
+  <div class="tabs">
+    <div class="tab active" id="tabHistoryBtn" onclick="switchTab('history')">Son İşlemler</div>
+    <div class="tab" id="tabDepotBtn" onclick="switchTab('depot')">Tüm Depo</div>
+    <div class="tab" id="tabAdminBtn" onclick="switchTab('admin')" style="display:none;">Yönetim</div>
+  </div>
+
+  <div class="tab-panel show" id="panelHistory">
     <div class="history-head">
       <h2>Son İşlemler</h2>
       <div style="display:flex; gap:6px; align-items:center;">
-        <button class="reset-session-btn" onclick="resetSession()">Oturumu Sıfırla</button>
+        <button class="small-btn" onclick="resetSession()">Oturumu Sıfırla</button>
         <span class="stat-pill" id="historyCount" style="font-size:10px;">0</span>
       </div>
     </div>
     <div class="tape" id="tape"><div class="tape-empty">Henüz işlem yok — bir barkod okutun</div></div>
   </div>
 
-  <div class="search-zone">
-    <input id="searchInput" type="text" placeholder="Ürün adı veya SKU ile ara">
-    <div class="search-results" id="searchResults"></div>
+  <div class="tab-panel" id="panelDepot">
+    <div class="depot-controls">
+      <input id="depotSearch" type="text" placeholder="Ürün adı, SKU veya barkod ara">
+      <button class="filter-btn" id="stockFilterBtn" onclick="toggleStockFilter()">Sadece stoklu</button>
+    </div>
+    <div class="depot-summary" id="depotSummary">—</div>
+    <div class="depot-list" id="depotList"></div>
+  </div>
+
+  <div class="tab-panel" id="panelAdmin">
+    <div class="admin-box">
+      <h3>Tüm Depoyu Sıfırla</h3>
+      <p>Tüm ürünlerin stok adedini sıfıra çeker. Bu işlem geri alınamaz — yeni bir sayıma sıfırdan başlamak için kullanın.</p>
+      <button class="danger-btn" onclick="openResetAllModal()">Tüm Depoyu Sıfırla</button>
+    </div>
   </div>
 
   <footer>Casalinghi · Ortak Depo Sistemi · Google Sheets ile senkron</footer>
 </div>
 
+<!-- Yeni urun ekleme modali -->
+<div class="modal-backdrop" id="addProductModal">
+  <div class="modal">
+    <h3>Yeni Ürün Ekle</h3>
+    <p>Bu barkod listede yok. Geçici olarak eklemek için bir isim yazın — SKU ve tam adı sonra düzenleyebilirsiniz.</p>
+    <div class="modal-code" id="newBarcodeDisplay">—</div>
+    <input id="newProductName" type="text" placeholder="Ürün adı (örn. Kırmızı kurdele 10mm)" autocomplete="off">
+    <input id="newProductSku" type="text" placeholder="SKU (biliyorsanız, boş bırakabilirsiniz)" autocomplete="off">
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeAddProductModal()">Vazgeç</button>
+      <button class="modal-btn primary" onclick="confirmAddProduct()">Ekle ve Say</button>
+    </div>
+  </div>
+</div>
+
+<!-- Depo sifirlama onay modali -->
+<div class="modal-backdrop" id="resetAllModal">
+  <div class="modal">
+    <h3>Tüm Depoyu Sıfırla</h3>
+    <p>Bütün ürünlerin stoğu 0 olacak ve bu işlem geri alınamaz. Onaylamak için aşağıya <b>SIFIRLA</b> yazın.</p>
+    <input id="resetConfirmInput" type="text" placeholder="SIFIRLA" autocomplete="off" autocapitalize="characters">
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeResetAllModal()">Vazgeç</button>
+      <button class="modal-btn danger" onclick="confirmResetAll()">Sıfırla</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ================= CONFIG =================
 const API_URL = 'https://script.google.com/macros/s/AKfycbwWQLeFzrYrP5dMcP5aW_WU5JPMRRtES3xV-BxoKE4q5vhtUoxRwl8BoDIK2dgYSjM/exec';
-// ============================================
+// ==========================================
 
 let PASSWORD = '';
+let userRole = 'personel';
 let mode = 'add';
-let catalog = [];       // [{barkod, sku, urun_adi, stok}]
+let catalog = [];
 let byBarcode = {};
 let history = JSON.parse(sessionStorage.getItem('depo_history') || '[]');
-let sessionCounts = JSON.parse(sessionStorage.getItem('depo_session_counts') || '{}'); // barkod -> bu oturumdaki net degisim
+let sessionCounts = JSON.parse(sessionStorage.getItem('depo_session_counts') || '{}');
 let cameraOn = false;
 let html5QrCode = null;
 let lastScanCode = null;
 let lastScanTime = 0;
 let isProcessingScan = false;
-const MANUAL_DUPLICATE_GUARD_MS = 900;   // elle/HID girişte kaza eseri cift gönderimi önler
-const CAMERA_RESUME_DELAY_MS = 5000;     // kamera bir urun ekledikten sonra bu sure kadar durur, sonra kendi kendine devam eder
 let cameraResumeTimer = null;
+let pendingNewBarcode = null;
+let stockFilterOn = false;
+let activeTab = 'history';
+const MANUAL_DUPLICATE_GUARD_MS = 900;
+const CAMERA_RESUME_DELAY_MS = 5000;
 
 // ---------- Sound ----------
 let audioCtx = null;
@@ -251,9 +364,7 @@ function beep(type){
   try{
     if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const now = audioCtx.currentTime;
-
     if(type === 'ok'){
-      // Net, dolgun "tok-bip" - telefon hoparlorunde bogulmayacak orta frekans araligi
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
       osc.type = 'sine';
@@ -265,7 +376,6 @@ function beep(type){
       osc.connect(gain); gain.connect(audioCtx.destination);
       osc.start(now); osc.stop(now + 0.16);
 
-      // Ustune net bir vurgu/parlaklik katmani (bogukluk vermez, netlik katar)
       const click = audioCtx.createOscillator();
       const clickGain = audioCtx.createGain();
       click.type = 'triangle';
@@ -274,7 +384,6 @@ function beep(type){
       clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.045);
       click.connect(clickGain); clickGain.connect(audioCtx.destination);
       click.start(now); click.stop(now + 0.05);
-
     } else if(type === 'error'){
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
@@ -285,7 +394,7 @@ function beep(type){
       gain.gain.linearRampToValueAtTime(0.22, now + 0.01);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
       osc.connect(gain); gain.connect(audioCtx.destination);
-      osc.start(now); osc.stop(now + 0.39);
+      osc.start(now); osc.stop(now + 0.34);
     }
   }catch(e){}
 }
@@ -296,7 +405,7 @@ function tryLogin(){
   if(!pw){ document.getElementById('loginErr').textContent = 'Şifre girin'; return; }
   PASSWORD = pw;
   document.getElementById('loginErr').textContent = '';
-  document.getElementById('pwInput').blur(); // klavyeyi kapat
+  document.getElementById('pwInput').blur();
   document.getElementById('loginOverlay').classList.add('hide');
   document.getElementById('loadingOverlay').classList.remove('hide');
   loadCatalog();
@@ -322,12 +431,14 @@ async function loadCatalog(){
       return;
     }
     catalog = data.products;
-    byBarcode = {};
-    catalog.forEach(p => byBarcode[String(p.barkod).trim()] = p);
+    userRole = data.role || 'personel';
+    rebuildIndex();
+    applyRoleUI(data.userName || userRole);
     document.getElementById('loadingOverlay').classList.add('hide');
     renderTotals();
     renderHistory();
-    document.getElementById('barcodeInput').focus();
+    renderDepot();
+    refocusInput();
   }catch(err){
     document.getElementById('loadingOverlay').classList.add('hide');
     document.getElementById('loginOverlay').classList.remove('hide');
@@ -335,26 +446,48 @@ async function loadCatalog(){
   }
 }
 
+function rebuildIndex(){
+  byBarcode = {};
+  catalog.forEach(p => byBarcode[String(p.barkod).trim()] = p);
+}
+
+function applyRoleUI(displayName){
+  const pill = document.getElementById('rolePill');
+  pill.textContent = displayName;
+  pill.className = 'role-pill ' + (userRole === 'admin' ? 'admin' : userRole === 'owner' ? 'owner' : 'personel');
+  document.getElementById('tabAdminBtn').style.display = (userRole === 'admin') ? 'block' : 'none';
+}
+
+// ---------- Tabs ----------
+function switchTab(tab){
+  activeTab = tab;
+  ['history','depot','admin'].forEach(t => {
+    const btn = document.getElementById('tab' + t.charAt(0).toUpperCase() + t.slice(1) + 'Btn');
+    const panel = document.getElementById('panel' + t.charAt(0).toUpperCase() + t.slice(1));
+    if(btn) btn.classList.toggle('active', t === tab);
+    if(panel) panel.classList.toggle('show', t === tab);
+  });
+  if(tab === 'depot') renderDepot();
+}
+
 // ---------- Mode ----------
 function setMode(m){
   mode = m;
   document.getElementById('modeAddBtn').classList.toggle('active-add', m==='add');
   document.getElementById('modeRemoveBtn').classList.toggle('active-remove', m==='remove');
-  document.getElementById('barcodeInput').focus();
+  refocusInput();
 }
 
-// ---------- Totals ----------
 function renderTotals(){
   const total = catalog.reduce((a,p)=>a + (Number(p.stok)||0), 0);
-  document.getElementById('totalStock').textContent = 'toplam: ' + total + ' adet';
+  document.getElementById('totalStock').textContent = total + ' adet';
   document.getElementById('catalogCount').textContent = catalog.length + ' ürün';
 }
 
-// ---------- Scan handler ----------
+// ---------- Scan ----------
 async function handleScan(code){
   code = (code || '').trim();
   if(!code) return;
-
   const now = Date.now();
   if(isProcessingScan) return;
   if(code === lastScanCode && (now - lastScanTime) < MANUAL_DUPLICATE_GUARD_MS) return;
@@ -367,11 +500,12 @@ async function handleScan(code){
 
   if(!product){
     beep('error');
-    card.className = 'result-card show err';
+    pendingNewBarcode = code;
+    card.className = 'result-card err';
     card.innerHTML = `
-      <div class="result-name">Barkod tanınmadı</div>
-      <div class="err-text">Kod: ${escapeHtml(code)}</div>
-      <div class="scan-hint" style="margin-top:8px;">Bu barkod ürün listesinde yok.</div>
+      <div class="result-name">Barkod listede yok</div>
+      <div class="err-text">${escapeHtml(code)}</div>
+      <button class="inline-action-btn" onclick="openAddProductModal()">Bu barkodu yeni ürün olarak ekle</button>
     `;
     resetInput();
     isProcessingScan = false;
@@ -379,71 +513,70 @@ async function handleScan(code){
   }
 
   const delta = mode === 'add' ? 1 : -1;
-  const before = Number(product.stok) || 0;
-
-  card.className = 'result-card show';
+  card.className = 'result-card';
   card.innerHTML = `<div class="result-name">${escapeHtml(product.urun_adi)}</div><div class="scan-hint" style="margin-top:8px;">Kaydediliyor…</div>`;
 
   try{
     const res = await apiCall({ action: 'update', barkod: code, delta: delta });
     if(!res.ok){
       beep('error');
-      card.className = 'result-card show err';
+      card.className = 'result-card err';
       card.innerHTML = `<div class="result-name">Hata</div><div class="err-text">${escapeHtml(res.error || 'bilinmeyen hata')}</div>`;
-      resetInput();
-      isProcessingScan = false;
-      return;
+      resetInput(); isProcessingScan = false; return;
     }
     beep('ok');
     product.stok = res.after;
-    const entry = { id: Date.now()+'-'+Math.random().toString(36).slice(2,7), barkod: code, name: product.urun_adi, sku: product.sku, delta: res.after-res.before, ts: Date.now(), stockAfter: res.after };
+    const entry = { id: Date.now()+'-'+Math.random().toString(36).slice(2,7), barkod: code, name: product.urun_adi,
+      sku: product.sku, delta: res.after-res.before, ts: Date.now(), stockAfter: res.after };
     history.unshift(entry);
     sessionStorage.setItem('depo_history', JSON.stringify(history.slice(0,60)));
-
     sessionCounts[code] = (sessionCounts[code] || 0) + entry.delta;
     sessionStorage.setItem('depo_session_counts', JSON.stringify(sessionCounts));
 
     renderResult(product, entry, res.before, res.after);
     renderTotals();
     renderHistory();
+    if(activeTab === 'depot') renderDepot();
   }catch(err){
-    card.className = 'result-card show err';
+    beep('error');
+    card.className = 'result-card err';
     card.innerHTML = `<div class="result-name">Bağlantı hatası</div><div class="err-text">İnternet bağlantınızı kontrol edin</div>`;
   }
   resetInput();
   isProcessingScan = false;
 }
 
-function resetSession(){
-  sessionCounts = {};
-  sessionStorage.setItem('depo_session_counts', '{}');
-  const card = document.getElementById('resultCard');
-  card.className = 'result-card show';
-  card.innerHTML = `<div class="result-name">Oturum sıfırlandı</div><div class="scan-hint" style="margin-top:6px;">Yeni parti için sayaçlar 0'dan başlıyor. Depo stoğu değişmedi.</div>`;
-}
-
 function resetInput(){
   document.getElementById('barcodeInput').value = '';
   if(!cameraOn) document.getElementById('barcodeInput').focus();
 }
+function refocusInput(){ if(!cameraOn) document.getElementById('barcodeInput').focus(); }
 
 function renderResult(product, entry, before, after){
   const card = document.getElementById('resultCard');
   const isAdd = entry.delta > 0;
   const sessionTotal = sessionCounts[entry.barkod] || 0;
-  const sessionSign = sessionTotal > 0 ? '+' : '';
-  card.className = 'result-card show ok';
+  const sign = sessionTotal > 0 ? '+' : '';
+  card.className = 'result-card ok';
   card.innerHTML = `
     <div class="result-top">
       <div class="result-name">${escapeHtml(product.urun_adi)}</div>
       <div class="result-delta ${isAdd?'add':'remove'}">${isAdd?'+1':'−1'}</div>
     </div>
-    <div class="result-meta"><span>SKU: ${escapeHtml(product.sku)}</span><span>Barkod: ${escapeHtml(product.barkod)}</span></div>
-    <div class="session-badge">Bu oturumda bu üründen: <b>${sessionSign}${sessionTotal}</b> adet</div>
+    <div class="result-meta"><span>SKU: ${escapeHtml(product.sku || '—')}</span><span>Barkod: ${escapeHtml(product.barkod)}</span></div>
+    <div class="session-badge">Bu oturumda bu üründen: <b>${sign}${sessionTotal}</b> adet</div>
     <div class="result-stockline">Depo stoğu: ${before} → <b>${after}</b> adet</div>
     <div class="countdown-line" id="countdownLine"></div>
     <button class="undo-btn" onclick="undoEntry('${entry.id}')">↩ Geri Al</button>
   `;
+}
+
+function resetSession(){
+  sessionCounts = {};
+  sessionStorage.setItem('depo_session_counts', '{}');
+  const card = document.getElementById('resultCard');
+  card.className = 'result-card idle';
+  card.innerHTML = `<div class="idle-text">Oturum sıfırlandı — sayaçlar 0'dan başlıyor</div>`;
 }
 
 async function undoEntry(id){
@@ -457,15 +590,13 @@ async function undoEntry(id){
       if(product) product.stok = res.after;
       history.splice(idx, 1);
       sessionStorage.setItem('depo_history', JSON.stringify(history.slice(0,60)));
-
       sessionCounts[entry.barkod] = (sessionCounts[entry.barkod] || 0) - entry.delta;
       sessionStorage.setItem('depo_session_counts', JSON.stringify(sessionCounts));
-
-      renderTotals();
-      renderHistory();
+      renderTotals(); renderHistory();
+      if(activeTab === 'depot') renderDepot();
       const card = document.getElementById('resultCard');
-      card.className = 'result-card show';
-      card.innerHTML = `<div class="result-name">Geri alındı</div><div class="scan-hint" style="margin-top:6px;">${escapeHtml(entry.name)} — stok: ${res.after} adet</div>`;
+      card.className = 'result-card idle';
+      card.innerHTML = `<div class="idle-text">Geri alındı — ${escapeHtml(entry.name)}: ${res.after} adet</div>`;
     }
   }catch(err){}
 }
@@ -477,38 +608,168 @@ function renderHistory(){
     tape.innerHTML = '<div class="tape-empty">Henüz işlem yok — bir barkod okutun</div>';
     return;
   }
-
-  // ardisik ayni barkod girislerini grupla (en yeni en ustte oldugu icin ardisik = zaman olarak yakin ayni urun)
-  const recent = history.slice(0, 60);
   const groups = [];
-  for(const h of recent){
+  for(const h of history.slice(0,60)){
     const last = groups[groups.length - 1];
     if(last && last.barkod === h.barkod && Math.sign(last.netDelta) === Math.sign(h.delta)){
-      last.count += 1;
-      last.netDelta += h.delta;
-      last.ids.push(h.id);
+      last.count += 1; last.netDelta += h.delta;
     } else {
-      groups.push({
-        barkod: h.barkod, name: h.name, sku: h.sku,
-        count: 1, netDelta: h.delta, stockAfter: h.stockAfter,
-        ts: h.ts, ids: [h.id]
-      });
+      groups.push({ barkod:h.barkod, name:h.name, sku:h.sku, count:1, netDelta:h.delta, stockAfter:h.stockAfter, ts:h.ts });
     }
   }
-
-  tape.innerHTML = groups.slice(0, 25).map(g => {
+  tape.innerHTML = groups.slice(0,25).map(g => {
     const isAdd = g.netDelta > 0;
     const time = new Date(g.ts).toLocaleTimeString('tr-TR', {hour:'2-digit', minute:'2-digit'});
-    const countBadge = g.count > 1 ? ` <span class="tape-count">×${g.count}</span>` : '';
-    return `
-      <div class="tape-row">
-        <div class="tape-icon ${isAdd?'add':'remove'}">${isAdd?'+':'−'}</div>
-        <div class="tape-info">
-          <div class="tape-name">${escapeHtml(g.name)}${countBadge}</div>
-          <div class="tape-sub">${time} · stok: ${g.stockAfter} · ${escapeHtml(g.sku)}</div>
-        </div>
-      </div>`;
+    const badge = g.count > 1 ? ` <span class="tape-count">×${g.count}</span>` : '';
+    return `<div class="tape-row">
+      <div class="tape-icon ${isAdd?'add':'remove'}">${isAdd?'+':'−'}</div>
+      <div class="tape-info">
+        <div class="tape-name">${escapeHtml(g.name)}${badge}</div>
+        <div class="tape-sub">${time} · stok: ${g.stockAfter} · ${escapeHtml(g.sku || '—')}</div>
+      </div>
+    </div>`;
   }).join('');
+}
+
+// ---------- Depot list ----------
+function toggleStockFilter(){
+  stockFilterOn = !stockFilterOn;
+  document.getElementById('stockFilterBtn').classList.toggle('on', stockFilterOn);
+  renderDepot();
+}
+document.getElementById('depotSearch').addEventListener('input', renderDepot);
+
+function renderDepot(){
+  const q = document.getElementById('depotSearch').value.trim().toLowerCase();
+  let list = catalog.slice();
+  if(stockFilterOn) list = list.filter(p => (Number(p.stok)||0) > 0);
+  if(q) list = list.filter(p =>
+    String(p.urun_adi).toLowerCase().includes(q) ||
+    String(p.sku).toLowerCase().includes(q) ||
+    String(p.barkod).toLowerCase().includes(q));
+  list.sort((a,b) => (Number(b.stok)||0) - (Number(a.stok)||0));
+
+  const totalQty = list.reduce((a,p)=>a+(Number(p.stok)||0),0);
+  const withStock = list.filter(p => (Number(p.stok)||0) > 0).length;
+  document.getElementById('depotSummary').textContent =
+    `${list.length} ürün gösteriliyor · ${withStock} üründe stok var · toplam ${totalQty} adet`;
+
+  const el = document.getElementById('depotList');
+  if(list.length === 0){ el.innerHTML = '<div class="tape-empty">Sonuç yok</div>'; return; }
+  el.innerHTML = list.slice(0,300).map(p => {
+    const qty = Number(p.stok)||0;
+    return `<div class="depot-row">
+      <div class="depot-info">
+        <div class="depot-name">${escapeHtml(p.urun_adi)}</div>
+        <div class="depot-sub">${escapeHtml(p.sku || '—')} · ${escapeHtml(p.barkod)}</div>
+      </div>
+      <div class="depot-qty ${qty>0?'has':'zero'}">${qty}</div>
+    </div>`;
+  }).join('');
+}
+
+// ---------- Add new product ----------
+function openAddProductModal(){
+  if(!pendingNewBarcode) return;
+  document.getElementById('newBarcodeDisplay').textContent = pendingNewBarcode;
+  document.getElementById('newProductName').value = '';
+  document.getElementById('newProductSku').value = '';
+  document.getElementById('addProductModal').classList.add('show');
+  setTimeout(()=>document.getElementById('newProductName').focus(), 100);
+}
+function closeAddProductModal(){
+  document.getElementById('addProductModal').classList.remove('show');
+  refocusInput();
+}
+async function confirmAddProduct(){
+  const name = document.getElementById('newProductName').value.trim();
+  const sku = document.getElementById('newProductSku').value.trim();
+  if(!name){ document.getElementById('newProductName').focus(); return; }
+  const barcode = pendingNewBarcode;
+  const startStock = mode === 'add' ? 1 : 0;
+  closeAddProductModal();
+
+  const card = document.getElementById('resultCard');
+  card.className = 'result-card';
+  card.innerHTML = `<div class="result-name">${escapeHtml(name)}</div><div class="scan-hint" style="margin-top:8px;">Ekleniyor…</div>`;
+
+  try{
+    const res = await apiCall({ action: 'addProduct', barkod: barcode, urun_adi: name, sku: sku, stok: startStock });
+    if(!res.ok){
+      beep('error');
+      card.className = 'result-card err';
+      card.innerHTML = `<div class="result-name">Eklenemedi</div><div class="err-text">${escapeHtml(res.error||'')}</div>`;
+      return;
+    }
+    beep('ok');
+    const newProduct = { barkod: barcode, sku: sku, urun_adi: name, stok: startStock };
+    catalog.push(newProduct);
+    rebuildIndex();
+    if(startStock > 0){
+      const entry = { id: Date.now()+'-'+Math.random().toString(36).slice(2,7), barkod: barcode, name: name,
+        sku: sku, delta: 1, ts: Date.now(), stockAfter: startStock };
+      history.unshift(entry);
+      sessionStorage.setItem('depo_history', JSON.stringify(history.slice(0,60)));
+      sessionCounts[barcode] = (sessionCounts[barcode] || 0) + 1;
+      sessionStorage.setItem('depo_session_counts', JSON.stringify(sessionCounts));
+    }
+    pendingNewBarcode = null;
+    card.className = 'result-card ok';
+    card.innerHTML = `
+      <div class="result-top">
+        <div class="result-name">${escapeHtml(name)}</div>
+        <div class="result-delta add">YENİ</div>
+      </div>
+      <div class="result-meta"><span>SKU: ${escapeHtml(sku || '—')}</span><span>Barkod: ${escapeHtml(barcode)}</span></div>
+      <div class="result-stockline">Listeye eklendi · stok: <b>${startStock}</b> adet</div>
+      <div class="countdown-line" id="countdownLine"></div>
+    `;
+    renderTotals(); renderHistory();
+    if(activeTab === 'depot') renderDepot();
+  }catch(err){
+    beep('error');
+    card.className = 'result-card err';
+    card.innerHTML = `<div class="result-name">Bağlantı hatası</div><div class="err-text">Tekrar deneyin</div>`;
+  }
+}
+
+// ---------- Reset all (admin) ----------
+function openResetAllModal(){
+  document.getElementById('resetConfirmInput').value = '';
+  document.getElementById('resetAllModal').classList.add('show');
+}
+function closeResetAllModal(){ document.getElementById('resetAllModal').classList.remove('show'); }
+
+async function confirmResetAll(){
+  const typed = document.getElementById('resetConfirmInput').value.trim().toUpperCase();
+  if(typed !== 'SIFIRLA'){
+    document.getElementById('resetConfirmInput').focus();
+    return;
+  }
+  closeResetAllModal();
+  const card = document.getElementById('resultCard');
+  card.className = 'result-card';
+  card.innerHTML = `<div class="result-name">Depo sıfırlanıyor…</div>`;
+  try{
+    const res = await apiCall({ action: 'resetAll' });
+    if(!res.ok){
+      beep('error');
+      card.className = 'result-card err';
+      card.innerHTML = `<div class="result-name">Sıfırlanamadı</div><div class="err-text">${escapeHtml(res.error||'')}</div>`;
+      return;
+    }
+    beep('ok');
+    catalog.forEach(p => p.stok = 0);
+    history = []; sessionStorage.setItem('depo_history', '[]');
+    sessionCounts = {}; sessionStorage.setItem('depo_session_counts', '{}');
+    renderTotals(); renderHistory(); renderDepot();
+    card.className = 'result-card ok';
+    card.innerHTML = `<div class="result-name">Depo sıfırlandı</div><div class="result-stockline">${res.reset} ürünün stoğu 0 yapıldı</div>`;
+  }catch(err){
+    beep('error');
+    card.className = 'result-card err';
+    card.innerHTML = `<div class="result-name">Bağlantı hatası</div>`;
+  }
 }
 
 function escapeHtml(s){
@@ -518,9 +779,8 @@ function escapeHtml(s){
 // ---------- Keyboard-wedge scanner ----------
 const input = document.getElementById('barcodeInput');
 input.addEventListener('keydown', (e) => { if(e.key === 'Enter'){ e.preventDefault(); handleScan(input.value); } });
-function refocusInput(){ if(!cameraOn) input.focus(); }
 document.addEventListener('click', (e) => {
-  if(e.target.closest('.undo-btn') || e.target.closest('#searchInput') || e.target.closest('.cam-toggle') || e.target.closest('.mode-btn')) return;
+  if(e.target.closest('button') || e.target.closest('input') || e.target.closest('.mode-btn') || e.target.closest('.tab') || e.target.closest('.modal')) return;
   refocusInput();
 });
 
@@ -533,13 +793,13 @@ async function toggleCamera(){
     document.getElementById('scanHint').textContent = 'Kamera açık — barkodu çerçeveye getirin';
     try{
       html5QrCode = new Html5Qrcode("reader");
-      const config = { fps: 12, qrbox: { width: 260, height: 140 }, formatsToSupport: [
+      const config = { fps: 12, qrbox: { width: 240, height: 120 }, aspectRatio: 1.6, formatsToSupport: [
         Html5QrcodeSupportedFormats.EAN_13, Html5QrcodeSupportedFormats.EAN_8,
         Html5QrcodeSupportedFormats.UPC_A, Html5QrcodeSupportedFormats.UPC_E,
         Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39,
         Html5QrcodeSupportedFormats.QR_CODE
       ]};
-      await html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => { onCameraDecode(decodedText); }, () => {});
+      await html5QrCode.start({ facingMode: "environment" }, config, (t) => { onCameraDecode(t); }, () => {});
     }catch(err){
       document.getElementById('scanHint').textContent = 'Kamera açılamadı — izin verildi mi kontrol edin';
       cameraOn = false; btn.classList.remove('on'); wrap.classList.remove('show');
@@ -553,10 +813,9 @@ async function toggleCamera(){
   }
 }
 
-// Kamera bir barkod yakaladiginda: hemen dur, isle, sonra geri sayimla kendi kendine devam et
 async function onCameraDecode(decodedText){
   if(!cameraOn || isProcessingScan) return;
-  if(cameraResumeTimer) return; // zaten bekleme/geri sayim asamasindaysa yeni okumayi yoksay
+  if(cameraResumeTimer) return;
 
   try{ await html5QrCode.pause(true); }catch(e){}
   const scanlineEl = document.getElementById('scanline');
@@ -567,7 +826,7 @@ async function onCameraDecode(decodedText){
   await handleScan(decodedText);
 
   let remaining = Math.ceil(CAMERA_RESUME_DELAY_MS / 1000);
-  const tickCountdown = () => {
+  const tick = () => {
     const line = document.getElementById('countdownLine');
     if(!line) return;
     if(remaining > 0){
@@ -578,48 +837,28 @@ async function onCameraDecode(decodedText){
       line.innerHTML = `<span class="dot"></span> Yeni ürün eklenecek`;
     }
   };
-  tickCountdown();
+  tick();
   hint.textContent = `Sonraki taramaya hazırlanıyor… (${remaining}s)`;
 
   cameraResumeTimer = setInterval(() => {
     remaining -= 1;
-    if(!cameraOn){
-      clearInterval(cameraResumeTimer); cameraResumeTimer = null;
-      return;
-    }
+    if(!cameraOn){ clearInterval(cameraResumeTimer); cameraResumeTimer = null; return; }
     if(remaining <= 0){
       clearInterval(cameraResumeTimer); cameraResumeTimer = null;
       try{ html5QrCode.resume(); }catch(e){}
       if(scanlineEl) scanlineEl.classList.remove('paused');
       hint.textContent = 'Kamera açık — barkodu çerçeveye getirin';
-      tickCountdown();
+      tick();
     } else {
       hint.textContent = `Sonraki taramaya hazırlanıyor… (${remaining}s)`;
-      tickCountdown();
+      tick();
     }
   }, 1000);
 }
 
-// ---------- Search ----------
-const searchInput = document.getElementById('searchInput');
-const searchResults = document.getElementById('searchResults');
-searchInput.addEventListener('input', () => {
-  const q = searchInput.value.trim().toLowerCase();
-  if(q.length < 2){ searchResults.classList.remove('show'); searchResults.innerHTML=''; return; }
-  const matches = catalog.filter(p =>
-    String(p.urun_adi).toLowerCase().includes(q) || String(p.sku).toLowerCase().includes(q) || String(p.barkod).toLowerCase().includes(q)
-  ).slice(0, 20);
-  searchResults.innerHTML = matches.length === 0
-    ? '<div class="tape-empty">Sonuç yok</div>'
-    : matches.map(p => `<div class="search-row"><span class="n">${escapeHtml(p.urun_adi)}</span><span class="s">${Number(p.stok)||0} adet</span></div>`).join('');
-  searchResults.classList.add('show');
-});
-
-// ---------- PWA: service worker kaydi (tam ekran/bagimsiz mod icin) ----------
+// ---------- PWA ----------
 if('serviceWorker' in navigator){
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
-  });
+  window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(()=>{}); });
 }
 </script>
 </body>
