@@ -231,7 +231,9 @@ let html5QrCode = null;
 let lastScanCode = null;
 let lastScanTime = 0;
 let isProcessingScan = false;
-const SCAN_COOLDOWN_MS = 2500;
+const MANUAL_DUPLICATE_GUARD_MS = 900;   // elle/HID girişte kaza eseri cift gönderimi önler
+const CAMERA_RESUME_DELAY_MS = 4500;     // kamera bir urun ekledikten sonra bu sure kadar durur, sonra kendi kendine devam eder
+let cameraResumeTimer = null;
 
 // ---------- Sound ----------
 let audioCtx = null;
@@ -239,20 +241,40 @@ function beep(type){
   try{
     if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     const now = audioCtx.currentTime;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.connect(gain); gain.connect(audioCtx.destination);
 
     if(type === 'ok'){
-      osc.frequency.setValueAtTime(1400, now);
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
-      osc.start(now); osc.stop(now + 0.13);
+      // Dolgun, alcak frekansli "tok" darbesi
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(210, now);
+      osc.frequency.exponentialRampToValueAtTime(65, now + 0.11);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(0.55, now + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.19);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(now); osc.stop(now + 0.2);
+
+      // Darbenin basini belirginlestiren kisa tik katmani
+      const click = audioCtx.createOscillator();
+      const clickGain = audioCtx.createGain();
+      click.type = 'triangle';
+      click.frequency.setValueAtTime(700, now);
+      clickGain.gain.setValueAtTime(0.08, now);
+      clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
+      click.connect(clickGain); clickGain.connect(audioCtx.destination);
+      click.start(now); click.stop(now + 0.03);
+
     } else if(type === 'error'){
-      osc.frequency.setValueAtTime(320, now);
-      gain.gain.setValueAtTime(0.15, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
-      osc.start(now); osc.stop(now + 0.3);
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(150, now);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(0.28, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.38);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(now); osc.stop(now + 0.39);
     }
   }catch(e){}
 }
@@ -323,7 +345,7 @@ async function handleScan(code){
 
   const now = Date.now();
   if(isProcessingScan) return;
-  if(code === lastScanCode && (now - lastScanTime) < SCAN_COOLDOWN_MS) return;
+  if(code === lastScanCode && (now - lastScanTime) < MANUAL_DUPLICATE_GUARD_MS) return;
   lastScanCode = code;
   lastScanTime = now;
   isProcessingScan = true;
@@ -390,7 +412,7 @@ function resetSession(){
 
 function resetInput(){
   document.getElementById('barcodeInput').value = '';
-  document.getElementById('barcodeInput').focus();
+  if(!cameraOn) document.getElementById('barcodeInput').focus();
 }
 
 function renderResult(product, entry, before, after){
@@ -504,17 +526,47 @@ async function toggleCamera(){
         Html5QrcodeSupportedFormats.CODE_128, Html5QrcodeSupportedFormats.CODE_39,
         Html5QrcodeSupportedFormats.QR_CODE
       ]};
-      await html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => { handleScan(decodedText); }, () => {});
+      await html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => { onCameraDecode(decodedText); }, () => {});
     }catch(err){
       document.getElementById('scanHint').textContent = 'Kamera açılamadı — izin verildi mi kontrol edin';
       cameraOn = false; btn.classList.remove('on'); wrap.classList.remove('show');
     }
   } else {
     cameraOn = false; btn.classList.remove('on'); wrap.classList.remove('show');
+    if(cameraResumeTimer){ clearInterval(cameraResumeTimer); cameraResumeTimer = null; }
     document.getElementById('scanHint').textContent = 'Kablosuz/kablolu okuyucu bu kutuya otomatik yazar · Enter ile onaylanır';
     if(html5QrCode){ try{ await html5QrCode.stop(); html5QrCode.clear(); }catch(e){} }
     refocusInput();
   }
+}
+
+// Kamera bir barkod yakaladiginda: hemen dur, isle, sonra geri sayimla kendi kendine devam et
+async function onCameraDecode(decodedText){
+  if(!cameraOn || isProcessingScan) return;
+  if(cameraResumeTimer) return; // zaten bekleme/geri sayim asamasindaysa yeni okumayi yoksay
+
+  try{ await html5QrCode.pause(true); }catch(e){}
+  const hint = document.getElementById('scanHint');
+  hint.textContent = 'İşleniyor…';
+
+  await handleScan(decodedText);
+
+  let remaining = Math.ceil(CAMERA_RESUME_DELAY_MS / 1000);
+  hint.textContent = `Sonraki taramaya hazırlanıyor… (${remaining}s)`;
+  cameraResumeTimer = setInterval(() => {
+    remaining -= 1;
+    if(!cameraOn){
+      clearInterval(cameraResumeTimer); cameraResumeTimer = null;
+      return;
+    }
+    if(remaining <= 0){
+      clearInterval(cameraResumeTimer); cameraResumeTimer = null;
+      try{ html5QrCode.resume(); }catch(e){}
+      hint.textContent = 'Kamera açık — barkodu çerçeveye getirin';
+    } else {
+      hint.textContent = `Sonraki taramaya hazırlanıyor… (${remaining}s)`;
+    }
+  }, 1000);
 }
 
 // ---------- Search ----------
