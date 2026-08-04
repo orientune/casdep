@@ -297,7 +297,7 @@
   <!-- 1. BILGI EKRANI -->
   <div class="result-zone">
     <div class="result-card idle" id="resultCard">
-      <div class="idle-text">Barkod okutulmayı bekliyor</div>
+      <div class="idle-text">KONTROL MODU · stok değişmez<br>Barkod okutun</div>
     </div>
   </div>
 
@@ -319,14 +319,14 @@
 
   <!-- 4. MOD BUTONLARI -->
   <div class="mode-switch">
-    <div class="mode-btn active-add" id="modeAddBtn" onclick="setMode('add')">
+    <div class="mode-btn active-check" id="modeCheckBtn" onclick="setMode('check')">
+      <div class="icon">⚖</div><div>KONTROL</div>
+    </div>
+    <div class="mode-btn" id="modeAddBtn" onclick="setMode('add')">
       <div class="icon">＋</div><div>EKLE</div>
     </div>
     <div class="mode-btn" id="modeRemoveBtn" onclick="setMode('remove')">
       <div class="icon">－</div><div>ÇIKAR</div>
-    </div>
-    <div class="mode-btn" id="modeCheckBtn" onclick="setMode('check')">
-      <div class="icon">⚖</div><div>KONTROL</div>
     </div>
   </div>
 
@@ -456,7 +456,7 @@ const API_URL = 'https://script.google.com/macros/s/AKfycbwWQLeFzrYrP5dMcP5aW_WU
 
 let PASSWORD = '';
 let userRole = 'personel';
-let mode = 'add';
+let mode = 'check';
 let catalog = [];
 let refList = [];
 let byBarcode = {};
@@ -744,7 +744,7 @@ function renderCheckCard(product){
       body += `<div class="check-perunit">Birim başına: <b>${perUnit.toFixed(2)} gr</b>
         &nbsp;·&nbsp; ±%3: <b>${formatNum(agirlik*0.97)} – ${formatNum(agirlik*1.03)} gr</b></div>`;
     }
-  } else if(userRole === 'admin'){
+  } else if(userRole === 'admin' || userRole === 'owner'){
     body += `<div class="check-empty">Ağırlık kayıtlı değil</div>`;
   } else if(!notlar){
     body += `<div class="check-empty">Bu ürün için kayıtlı bilgi yok</div>`;
@@ -752,7 +752,7 @@ function renderCheckCard(product){
 
   // Butonlar: not -> owner+admin, agirlik -> sadece admin
   const canNote   = (userRole === 'admin' || userRole === 'owner');
-  const canWeight = (userRole === 'admin');
+  const canWeight = (userRole === 'admin' || userRole === 'owner');
   if(canNote || canWeight){
     const btns = [];
     if(canNote)   btns.push(`<button class="modal-btn" onclick="openNoteModal()">${notlar ? 'Notu düzenle' : 'Not ekle'}</button>`);
