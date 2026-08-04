@@ -81,6 +81,8 @@
   .inline-action-btn{margin-top:12px; width:100%; padding:12px; border-radius:9px; border:none; background:var(--amber);
     color:#1A1500; font-family:var(--sans); font-weight:700; font-size:13.5px; cursor:pointer;}
   .dual-actions{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px;}
+  .single-action{margin-top:12px;}
+  .single-action .modal-btn{width:100%;}
 
   /* Kontrol modu */
   .result-card.check{border-color:#4EA8DE;}
@@ -742,16 +744,21 @@ function renderCheckCard(product){
       body += `<div class="check-perunit">Birim başına: <b>${perUnit.toFixed(2)} gr</b>
         &nbsp;·&nbsp; ±%3: <b>${formatNum(agirlik*0.97)} – ${formatNum(agirlik*1.03)} gr</b></div>`;
     }
-  } else {
+  } else if(userRole === 'admin'){
     body += `<div class="check-empty">Ağırlık kayıtlı değil</div>`;
+  } else if(!notlar){
+    body += `<div class="check-empty">Bu ürün için kayıtlı bilgi yok</div>`;
   }
 
-  body += `
-    <div class="dual-actions">
-      <button class="modal-btn" onclick="openNoteModal()">${notlar ? 'Notu düzenle' : 'Not ekle'}</button>
-      <button class="modal-btn primary" onclick="openWeightModal()">${agirlik ? 'Gramı değiştir' : 'Ağırlığı kaydet'}</button>
-    </div>
-  `;
+  // Butonlar: not -> owner+admin, agirlik -> sadece admin
+  const canNote   = (userRole === 'admin' || userRole === 'owner');
+  const canWeight = (userRole === 'admin');
+  if(canNote || canWeight){
+    const btns = [];
+    if(canNote)   btns.push(`<button class="modal-btn" onclick="openNoteModal()">${notlar ? 'Notu düzenle' : 'Not ekle'}</button>`);
+    if(canWeight) btns.push(`<button class="modal-btn primary" onclick="openWeightModal()">${agirlik ? 'Gramı değiştir' : 'Ağırlığı kaydet'}</button>`);
+    body += `<div class="${btns.length > 1 ? 'dual-actions' : 'single-action'}">${btns.join('')}</div>`;
+  }
 
   card.className = 'result-card check';
   card.innerHTML = body;
