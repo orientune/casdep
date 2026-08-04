@@ -82,6 +82,43 @@
     color:#1A1500; font-family:var(--sans); font-weight:700; font-size:13.5px; cursor:pointer;}
   .dual-actions{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px;}
 
+  /* Kontrol modu */
+  .result-card.check{border-color:#4EA8DE;}
+  .result-delta.check{color:#4EA8DE; background:#1E3A4D; font-size:17px;}
+  .check-grid{display:grid; grid-template-columns:1fr 1.3fr; gap:8px; margin-top:11px;}
+  .check-cell{background:var(--panel-raised); border:1px solid var(--line); border-radius:9px; padding:9px 11px;}
+  .check-cell.primary{background:#1E3A4D; border-color:#4EA8DE;}
+  .check-label{font-family:var(--mono); font-size:9.5px; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.6px;}
+  .check-cell.primary .check-label{color:#8FCBEC;}
+  .check-value{font-family:var(--mono); font-size:22px; font-weight:700; color:var(--ink); margin-top:3px; line-height:1;}
+  .check-cell.primary .check-value{color:#4EA8DE;}
+  .check-unit{font-size:11px; font-weight:400; color:var(--ink-faint); margin-left:5px;}
+  .check-cell.primary .check-unit{color:#8FCBEC;}
+  .check-perunit{margin-top:9px; font-family:var(--mono); font-size:11.5px; color:var(--ink-dim); line-height:1.6;}
+  .check-perunit b{color:var(--ink);}
+  .check-empty{margin-top:11px; padding:11px; border-radius:9px; background:var(--panel-raised); border:1px dashed var(--line);
+    font-family:var(--mono); font-size:12.5px; color:var(--ink-faint); text-align:center;}
+  .note-box{margin-top:11px; padding:10px 12px; border-radius:9px; background:#3A2E12; border:1.5px solid var(--amber);}
+  .note-label{font-family:var(--mono); font-size:9.5px; color:var(--amber); letter-spacing:.7px; margin-bottom:4px;}
+  .note-text{font-size:13px; color:#FFD98A; line-height:1.45; white-space:pre-wrap;}
+  .modal textarea{width:100%; background:var(--panel-raised); border:1.5px solid var(--line); border-radius:9px; color:var(--ink);
+    font-family:var(--sans); font-size:14px; padding:12px; outline:none; margin-bottom:9px; resize:vertical;}
+  .modal textarea:focus{border-color:var(--amber);}
+
+  /* Agirlik modali */
+  .w-row{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .w-label{display:block; font-family:var(--mono); font-size:10px; color:var(--ink-faint); text-transform:uppercase;
+    letter-spacing:.5px; margin-bottom:4px;}
+  .modal select{width:100%; background:var(--panel-raised); border:1.5px solid var(--line); border-radius:9px; color:var(--ink);
+    font-family:var(--sans); font-size:14px; padding:12px; outline:none; margin-bottom:9px;}
+  .ref-results{margin-bottom:9px;}
+  .ref-row{display:flex; justify-content:space-between; align-items:center; gap:8px; padding:9px 11px;
+    background:var(--panel-raised); border:1px solid var(--line); border-radius:8px; margin-bottom:5px; cursor:pointer; font-size:12px;}
+  .ref-row:active{border-color:var(--amber);}
+  .ref-name{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1;}
+  .ref-w{font-family:var(--mono); color:var(--amber); font-weight:700; flex-shrink:0;}
+  .ref-empty{padding:10px; text-align:center; color:var(--ink-faint); font-size:11.5px; font-family:var(--mono);}
+
   /* ===== 2. Kamera ===== */
   .scan-zone{padding:12px 16px 0;}
   .scan-card{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:12px;}
@@ -108,13 +145,14 @@
   .scan-hint{font-size:11px; color:var(--ink-faint); margin-top:8px; font-family:var(--mono);}
 
   /* ===== 4. Mod butonlari ===== */
-  .mode-switch{display:grid; grid-template-columns:1fr 1fr; gap:8px; padding:12px 16px 0;}
-  .mode-btn{padding:15px 8px; border-radius:12px; border:1.5px solid var(--line); background:var(--panel); color:var(--ink-dim);
-    font-family:var(--sans); font-weight:600; font-size:13.5px; display:flex; flex-direction:column; align-items:center; gap:4px;
+  .mode-switch{display:grid; grid-template-columns:1fr 1fr 1fr; gap:7px; padding:12px 16px 0;}
+  .mode-btn{padding:14px 4px; border-radius:12px; border:1.5px solid var(--line); background:var(--panel); color:var(--ink-dim);
+    font-family:var(--sans); font-weight:600; font-size:12px; display:flex; flex-direction:column; align-items:center; gap:4px;
     cursor:pointer; transition:all .15s ease; user-select:none;}
-  .mode-btn .icon{font-size:19px; line-height:1;}
+  .mode-btn .icon{font-size:18px; line-height:1;}
   .mode-btn.active-add{background:var(--green-dim); border-color:var(--green); color:var(--green);}
   .mode-btn.active-remove{background:var(--red-dim); border-color:var(--red); color:var(--red);}
+  .mode-btn.active-check{background:#1E3A4D; border-color:#4EA8DE; color:#4EA8DE;}
 
   /* ===== Sekmeler ===== */
   .tabs{display:flex; gap:6px; padding:20px 16px 0;}
@@ -280,10 +318,13 @@
   <!-- 4. MOD BUTONLARI -->
   <div class="mode-switch">
     <div class="mode-btn active-add" id="modeAddBtn" onclick="setMode('add')">
-      <div class="icon">＋</div><div>DEPOYA EKLE</div>
+      <div class="icon">＋</div><div>EKLE</div>
     </div>
     <div class="mode-btn" id="modeRemoveBtn" onclick="setMode('remove')">
-      <div class="icon">－</div><div>DEPODAN ÇIKAR</div>
+      <div class="icon">－</div><div>ÇIKAR</div>
+    </div>
+    <div class="mode-btn" id="modeCheckBtn" onclick="setMode('check')">
+      <div class="icon">⚖</div><div>KONTROL</div>
     </div>
   </div>
 
@@ -345,6 +386,54 @@
   </div>
 </div>
 
+<!-- Not duzenleme modali -->
+<div class="modal-backdrop" id="noteModal">
+  <div class="modal">
+    <h3>Hazırlama Notu</h3>
+    <p id="noteProductName" style="color:var(--ink); font-size:13px; margin-bottom:12px;">—</p>
+    <p>Bu ürünü hazırlarken dikkat edilmesi gerekenler. Kontrol modunda barkod okutulunca görünür.</p>
+    <textarea id="noteText" rows="4" placeholder="Örn. Kapak payı katlanmadan sayılacak · çift kat sarılacak"></textarea>
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeNoteModal()">Vazgeç</button>
+      <button class="modal-btn primary" onclick="saveNote()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Agirlik kaydetme modali -->
+<div class="modal-backdrop" id="weightModal">
+  <div class="modal">
+    <h3>Ağırlık Bilgisi</h3>
+    <p id="weightProductName" style="color:var(--ink); font-size:13px; margin-bottom:12px;">—</p>
+
+    <input id="refSearch" type="text" placeholder="Kayıtlı ölçümlerde ara (örn. 10*15 opp)" autocomplete="off" oninput="searchRefs()">
+    <div id="refResults" class="ref-results"></div>
+
+    <div class="w-row">
+      <div>
+        <label class="w-label">İçerik</label>
+        <input id="wIcerik" type="number" inputmode="numeric" placeholder="50">
+      </div>
+      <div>
+        <label class="w-label">Birim</label>
+        <select id="wBirim">
+          <option value="adet">adet</option>
+          <option value="metre">metre</option>
+          <option value="gram">gram</option>
+        </select>
+      </div>
+    </div>
+
+    <label class="w-label">Tartılan ağırlık (gram)</label>
+    <input id="wAgirlik" type="number" inputmode="decimal" step="0.1" placeholder="33">
+
+    <div class="modal-actions">
+      <button class="modal-btn" onclick="closeWeightModal()">Vazgeç</button>
+      <button class="modal-btn primary" onclick="saveWeightInfo()">Kaydet</button>
+    </div>
+  </div>
+</div>
+
 <!-- Depo sifirlama onay modali -->
 <div class="modal-backdrop" id="resetAllModal">
   <div class="modal">
@@ -367,6 +456,7 @@ let PASSWORD = '';
 let userRole = 'personel';
 let mode = 'add';
 let catalog = [];
+let refList = [];
 let byBarcode = {};
 let history = JSON.parse(sessionStorage.getItem('depo_history') || '[]');
 let sessionCounts = JSON.parse(sessionStorage.getItem('depo_session_counts') || '{}');
@@ -456,6 +546,7 @@ async function loadCatalog(){
       return;
     }
     catalog = data.products;
+    refList = data.refs || [];
     userRole = data.role || 'personel';
     rebuildIndex();
     applyRoleUI(data.userName || userRole);
@@ -520,6 +611,12 @@ function setMode(m){
   mode = m;
   document.getElementById('modeAddBtn').classList.toggle('active-add', m==='add');
   document.getElementById('modeRemoveBtn').classList.toggle('active-remove', m==='remove');
+  document.getElementById('modeCheckBtn').classList.toggle('active-check', m==='check');
+  const card = document.getElementById('resultCard');
+  card.className = 'result-card idle';
+  card.innerHTML = m === 'check'
+    ? `<div class="idle-text">KONTROL MODU · stok değişmez<br>Barkod okutun</div>`
+    : `<div class="idle-text">Barkod okutulmayı bekliyor</div>`;
   refocusInput();
 }
 
@@ -560,6 +657,15 @@ async function handleScan(code){
     return;
   }
 
+  // ===== KONTROL MODU: stok degistirmez, agirlik/icerik gosterir =====
+  if(mode === 'check'){
+    beep('ok');
+    renderCheckCard(product);
+    resetInput();
+    isProcessingScan = false;
+    return;
+  }
+
   const delta = mode === 'add' ? 1 : -1;
   card.className = 'result-card';
   card.innerHTML = `<div class="result-name">${escapeHtml(product.urun_adi)}</div><div class="scan-hint" style="margin-top:8px;">Kaydediliyor…</div>`;
@@ -592,6 +698,180 @@ async function handleScan(code){
   }
   resetInput();
   isProcessingScan = false;
+}
+
+// ===== KONTROL MODU =====
+let checkProduct = null;
+
+function renderCheckCard(product){
+  checkProduct = product;
+  const card = document.getElementById('resultCard');
+  const icerik = Number(product.icerik) || null;
+  const birim = String(product.birim || '').trim();
+  const agirlik = Number(product.agirlik) || null;
+  const notlar = String(product.notlar || '').trim();
+
+  let body = `
+    <div class="countdown-line" id="countdownLine" style="display:none;"></div>
+    <div class="result-top">
+      <div class="result-name">${escapeHtml(product.urun_adi)}</div>
+      <div class="result-delta check">⚖</div>
+    </div>
+    <div class="result-meta"><span>Barkod: ${escapeHtml(product.barkod)}</span></div>
+  `;
+
+  if(notlar){
+    body += `<div class="note-box"><div class="note-label">HAZIRLAMA NOTU</div><div class="note-text">${escapeHtml(notlar)}</div></div>`;
+  }
+
+  if(agirlik){
+    const perUnit = (icerik && icerik > 0) ? (agirlik / icerik) : null;
+    body += `
+      <div class="check-grid">
+        <div class="check-cell">
+          <div class="check-label">İçerik</div>
+          <div class="check-value">${icerik ? icerik : '—'}<span class="check-unit">${escapeHtml(birim || '')}</span></div>
+        </div>
+        <div class="check-cell primary">
+          <div class="check-label">Hedef ağırlık</div>
+          <div class="check-value">${formatNum(agirlik)}<span class="check-unit">gram</span></div>
+        </div>
+      </div>
+    `;
+    if(perUnit){
+      body += `<div class="check-perunit">Birim başına: <b>${perUnit.toFixed(2)} gr</b>
+        &nbsp;·&nbsp; ±%3: <b>${formatNum(agirlik*0.97)} – ${formatNum(agirlik*1.03)} gr</b></div>`;
+    }
+  } else {
+    body += `<div class="check-empty">Ağırlık kayıtlı değil</div>`;
+  }
+
+  body += `
+    <div class="dual-actions">
+      <button class="modal-btn" onclick="openNoteModal()">${notlar ? 'Notu düzenle' : 'Not ekle'}</button>
+      <button class="modal-btn primary" onclick="openWeightModal()">${agirlik ? 'Gramı değiştir' : 'Ağırlığı kaydet'}</button>
+    </div>
+  `;
+
+  card.className = 'result-card check';
+  card.innerHTML = body;
+}
+
+function formatNum(n){
+  const v = Number(n);
+  return (Math.abs(v - Math.round(v)) < 0.05) ? String(Math.round(v)) : v.toFixed(1);
+}
+
+// ---- Not duzenleme ----
+function openNoteModal(){
+  if(!checkProduct) return;
+  document.getElementById('noteProductName').textContent = checkProduct.urun_adi;
+  document.getElementById('noteText').value = String(checkProduct.notlar || '');
+  document.getElementById('noteModal').classList.add('show');
+  setTimeout(()=>document.getElementById('noteText').focus(), 100);
+}
+function closeNoteModal(){
+  document.getElementById('noteModal').classList.remove('show');
+  refocusInput();
+}
+async function saveNote(){
+  if(!checkProduct) return;
+  const note = document.getElementById('noteText').value.trim();
+  const barkod = checkProduct.barkod;
+  closeNoteModal();
+
+  const card = document.getElementById('resultCard');
+  card.className = 'result-card';
+  card.innerHTML = `<div class="result-name">${escapeHtml(checkProduct.urun_adi)}</div><div class="scan-hint" style="margin-top:8px;">Not kaydediliyor…</div>`;
+
+  try{
+    const res = await apiCall({ action:'saveInfo', barkod: barkod, notlar: note });
+    if(!res.ok){
+      beep('error');
+      card.className = 'result-card err';
+      card.innerHTML = `<div class="result-name">Kaydedilemedi</div><div class="err-text">${escapeHtml(res.error||'')}</div>`;
+      return;
+    }
+    beep('ok');
+    const p = byBarcode[barkod];
+    if(p) p.notlar = note;
+    renderCheckCard(p || checkProduct);
+  }catch(err){
+    beep('error');
+    card.className = 'result-card err';
+    card.innerHTML = `<div class="result-name">Bağlantı hatası</div>`;
+  }
+}
+
+function openWeightModal(){
+  if(!checkProduct) return;
+  document.getElementById('weightProductName').textContent = checkProduct.urun_adi;
+  document.getElementById('wIcerik').value = checkProduct.icerik || '';
+  document.getElementById('wBirim').value = String(checkProduct.birim || 'adet');
+  document.getElementById('wAgirlik').value = checkProduct.agirlik || '';
+  document.getElementById('refSearch').value = '';
+  document.getElementById('refResults').innerHTML = '';
+  document.getElementById('weightModal').classList.add('show');
+  setTimeout(()=>document.getElementById('wAgirlik').focus(), 100);
+}
+function closeWeightModal(){
+  document.getElementById('weightModal').classList.remove('show');
+  refocusInput();
+}
+
+// Olcum referans listesinden oneri
+function searchRefs(){
+  const q = document.getElementById('refSearch').value.trim().toLowerCase();
+  const box = document.getElementById('refResults');
+  if(q.length < 2){ box.innerHTML = ''; return; }
+  const hits = refList.filter(r => String(r.ad).toLowerCase().includes(q)).slice(0, 6);
+  box.innerHTML = hits.length === 0
+    ? `<div class="ref-empty">Eşleşme yok</div>`
+    : hits.map(r => `<div class="ref-row" onclick="applyRef(${escapeAttr(JSON.stringify(r))})">
+        <span class="ref-name">${escapeHtml(r.ad)}</span>
+        <span class="ref-w">${escapeHtml(String(r.agirlik_gr||'—'))} gr</span>
+      </div>`).join('');
+}
+function escapeAttr(s){ return escapeHtml(s).replace(/'/g, '&#39;'); }
+
+function applyRef(r){
+  if(r.icerik) document.getElementById('wIcerik').value = r.icerik;
+  if(r.birim) document.getElementById('wBirim').value = r.birim;
+  if(r.agirlik_gr) document.getElementById('wAgirlik').value = r.agirlik_gr;
+  document.getElementById('refResults').innerHTML = '';
+  document.getElementById('refSearch').value = '';
+}
+
+async function saveWeightInfo(){
+  if(!checkProduct) return;
+  const icerik = document.getElementById('wIcerik').value.trim();
+  const birim = document.getElementById('wBirim').value.trim();
+  const agirlik = document.getElementById('wAgirlik').value.trim();
+  if(!agirlik){ document.getElementById('wAgirlik').focus(); return; }
+  const barkod = checkProduct.barkod;
+  closeWeightModal();
+
+  const card = document.getElementById('resultCard');
+  card.className = 'result-card';
+  card.innerHTML = `<div class="result-name">${escapeHtml(checkProduct.urun_adi)}</div><div class="scan-hint" style="margin-top:8px;">Kaydediliyor…</div>`;
+
+  try{
+    const res = await apiCall({ action:'saveInfo', barkod: barkod, icerik: icerik, birim: birim, agirlik: agirlik });
+    if(!res.ok){
+      beep('error');
+      card.className = 'result-card err';
+      card.innerHTML = `<div class="result-name">Kaydedilemedi</div><div class="err-text">${escapeHtml(res.error||'')}</div>`;
+      return;
+    }
+    beep('ok');
+    const p = byBarcode[barkod];
+    if(p){ p.icerik = icerik; p.birim = birim; p.agirlik = agirlik; }
+    renderCheckCard(p || checkProduct);
+  }catch(err){
+    beep('error');
+    card.className = 'result-card err';
+    card.innerHTML = `<div class="result-name">Bağlantı hatası</div>`;
+  }
 }
 
 function resetInput(){
@@ -895,10 +1175,11 @@ async function onCameraDecode(decodedText){
 
   await handleScan(decodedText);
 
-  let remaining = countdownSeconds;
+  let remaining = (mode === 'check') ? 2 : countdownSeconds;
   const tick = () => {
     const line = document.getElementById('countdownLine');
     if(!line) return;
+    line.style.display = 'flex';
     if(remaining > 0){
       line.className = 'countdown-line';
       line.innerHTML = `<span class="dot"></span> BEKLEYİN <span class="num">${remaining}</span>`;
